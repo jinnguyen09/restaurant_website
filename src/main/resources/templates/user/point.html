@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo - Phở Hầm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Saira:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body class="bg-[#fcfcfc] text-gray-800">
+
+<div th:replace="~{layout/user/navbar :: header}"></div>
+
+<main class="min-h-screen bg-gray-50 py-16 px-6 text-gray-800 antialiased">
+        <div class="max-w-5xl mx-auto">
+            
+            <div class="text-center mb-14">
+                <h1 class="text-5xl font-extrabold text-red-700 mb-4 tracking-tight">Điểm Tích Lũy</h1>
+                <p class="text-xl text-gray-500 font-medium">Tích điểm và đổi quà hấp dẫn mỗi ngày</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
+                <div class="bg-red-700 rounded-[2.5rem] p-10 text-white text-center shadow-2xl shadow-red-200/50 flex flex-col justify-center items-center group transition-transform hover:scale-[1.03]">
+                    <div class="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-6 shadow-inner text-4xl">
+                        🏅
+                    </div>
+                    <div class="text-6xl font-black mb-2">450</div>
+                    <div class="text-sm uppercase font-bold tracking-[0.2em] text-red-100">Điểm hiện tại</div>
+                </div>
+
+                <div class="md:col-span-2 bg-white rounded-[2.5rem] p-10 shadow-sm border border-gray-100 flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="text-3xl text-red-600">📈</span>
+                            <span class="text-2xl font-bold text-gray-800">Tiến trình</span>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-700 text-sm px-4 py-1.5 rounded-full font-black uppercase tracking-wider">50 điểm nữa</span>
+                    </div>
+                    
+                    <div class="w-full h-6 bg-gray-100 rounded-full overflow-hidden mb-6 p-1.5 shadow-inner">
+                        <div class="h-full bg-gradient-to-r from-red-600 to-red-800 rounded-full transition-all duration-1000 ease-out shadow-md" style="width: 85%"></div>
+                    </div>
+                    <p class="text-lg text-gray-500 font-medium leading-relaxed">
+                        Tích thêm <span class="text-red-700 font-bold underline decoration-red-200 underline-offset-4">50 điểm</span> để mở khóa phần thưởng tiếp theo.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mb-14">
+                <div class="flex items-center gap-4 mb-10">
+                    <span class="text-3xl">🎁</span>
+                    <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Đổi điểm lấy quà</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white rounded-[2.5rem] p-8 border-2 border-red-600 shadow-sm flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-3 group">
+                        <div class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform text-3xl">
+                            ⭐
+                        </div>
+                        <div class="text-red-700 font-black text-2xl mb-2">100 điểm</div>
+                        <p class="text-lg font-bold text-gray-800 mb-1">Giảm 10.000đ</p>
+                        <p class="text-xs text-gray-400 mb-8 uppercase font-black tracking-widest">Đơn từ 100.000đ</p>
+                        <button class="w-full bg-red-700 text-white py-4 rounded-2xl font-black text-base shadow-xl shadow-red-100 hover:bg-red-800 active:scale-95 transition-all uppercase tracking-wider">Đổi quà</button>
+                    </div>
+
+                    <div class="bg-white rounded-[2.5rem] p-8 border-2 border-red-600 shadow-sm flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl hover:-translate-y-3 group">
+                        <div class="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform text-3xl">
+                            ⭐
+                        </div>
+                        <div class="text-red-700 font-black text-2xl mb-2">250 điểm</div>
+                        <p class="text-lg font-bold text-gray-800 mb-1">Giảm 30.000đ</p>
+                        <p class="text-xs text-gray-400 mb-8 uppercase font-black tracking-widest">Đơn từ 200.000đ</p>
+                        <button class="w-full bg-red-700 text-white py-4 rounded-2xl font-black text-base shadow-xl shadow-red-100 hover:bg-red-800 active:scale-95 transition-all uppercase tracking-wider">Đổi quà</button>
+                    </div>
+
+                    <div class="bg-gray-50/50 rounded-[2.5rem] p-8 border border-gray-200 flex flex-col items-center text-center opacity-70">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-3xl grayscale">⭐</div>
+                        <div class="text-gray-400 font-black text-2xl mb-2">500 điểm</div>
+                        <p class="text-lg font-bold text-gray-400 mb-1">Giảm 60.000đ</p>
+                        <button class="w-full bg-gray-300 text-white py-4 rounded-2xl font-black text-base cursor-not-allowed uppercase">Chưa đủ điểm</button>
+                    </div>
+
+                    <div class="bg-gray-50/50 rounded-[2.5rem] p-8 border border-gray-200 flex flex-col items-center text-center opacity-70">
+                        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-3xl grayscale">🎁</div>
+                        <div class="text-gray-400 font-black text-2xl mb-2">1000 điểm</div>
+                        <p class="text-lg font-bold text-gray-400 mb-1">Freeship 30 ngày</p>
+                        <button class="w-full bg-gray-300 text-white py-4 rounded-2xl font-black text-base cursor-not-allowed uppercase">Chưa đủ điểm</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] p-10 shadow-sm border border-gray-100 mb-12">
+                <h3 class="font-extrabold text-2xl text-gray-900 mb-8 flex items-center gap-3">
+                    <span class="text-red-600">📜</span> Lịch sử điểm
+                </h3>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center p-6 hover:bg-gray-50 rounded-3xl transition-colors cursor-default">
+                        <div>
+                            <p class="font-bold text-gray-900 text-lg">Đơn hàng #12345</p>
+                            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">01/02/2026</p>
+                        </div>
+                        <span class="text-green-600 font-black text-2xl">+15</span>
+                    </div>
+                    <hr class="border-gray-50 mx-6">
+                    <div class="flex justify-between items-center p-6 hover:bg-gray-50 rounded-3xl transition-colors cursor-default">
+                        <div>
+                            <p class="font-bold text-gray-900 text-lg">Sử dụng voucher giảm giá</p>
+                            <p class="text-sm text-gray-400 font-bold uppercase tracking-widest mt-1">25/01/2026</p>
+                        </div>
+                        <span class="text-red-600 font-black text-2xl">-100</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 rounded-[2.5rem] p-10 border border-amber-100 shadow-inner">
+                
+                <h3 class="font-black text-2xl text-amber-900 mb-6 flex items-center gap-3">
+                    <span class="bg-amber-200 w-10 h-10 flex items-center justify-center rounded-full text-xl shadow-sm">💡</span> 
+                    Cách tích điểm nhanh
+                </h3>
+
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <li class="flex items-start gap-4 p-4 bg-white/40 rounded-2xl">
+                        <span class="text-2xl mt-1">✨</span>
+                        <span class="text-lg text-amber-900 font-semibold leading-snug">Mỗi 10.000đ chi tiêu = <span class="text-red-700 font-black">1 điểm</span></span>
+                    </li>
+                    <li class="flex items-start gap-4 p-4 bg-white/40 rounded-2xl">
+                        <span class="text-2xl mt-1">🥇</span>
+                        <span class="text-lg text-amber-900 font-semibold leading-snug">Đơn hàng đầu tiên: <span class="text-red-700 font-black">+50 điểm</span></span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+<div th:replace="~{layout/user/footer :: footer_section}"></div>
+<script src="/js/main.js"></script>
+</body>
+</html>

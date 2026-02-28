@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài đọc - hở Hầm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Saira:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 index-page">
+
+<div th:replace="~{layout/user/navbar :: header}"></div>
+
+<main class="bg-gray-50 min-h-screen py-16 px-4 font-sans text-gray-900">
+        <div class="max-w-4xl mx-auto">
+            <a href="blog.html" class="group inline-flex items-center text-gray-500 hover:text-red-600 mb-10 transition-all duration-300 transform hover:-translate-x-2">
+                <span class="mr-3 bg-white p-2 rounded-full shadow-sm group-hover:shadow-md transition-all">←</span> 
+                <span class="font-bold uppercase tracking-widest text-xs">Quay lại Blog</span>
+            </a>
+
+            <header class="mb-12">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="bg-red-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg uppercase tracking-widest shadow-lg shadow-red-100">Văn hóa</span>
+                    <span class="text-gray-400 text-sm font-medium">10 phút đọc</span>
+                </div>
+                
+                <h1 class="text-4xl md:text-6xl font-black text-gray-900 leading-tight mb-8">
+                    Lịch sử và văn hóa ẩm thực Việt Nam qua <span class="text-red-600 italic">tô phở</span>
+                </h1>
+
+                <div class="flex items-center justify-between p-6 bg-white/60 backdrop-blur-md rounded-[2rem] border border-white shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 font-bold shadow-inner">DT</div>
+                        <div>
+                            <p class="font-black text-gray-900">Nguyen Dinh Thiep</p>
+                            <p class="text-xs text-gray-400 font-bold uppercase tracking-tighter">Tác giả chuyên mục</p>
+                        </div>
+                    </div>
+                    <div class="hidden sm:block text-right">
+                        <p class="text-sm font-bold text-gray-900">10 Tháng 1, 2026</p>
+                        <p class="text-xs text-gray-400 font-medium">Cập nhật lúc 08:30 AM</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="relative h-[400px] md:h-[550px] rounded-[3rem] overflow-hidden shadow-2xl mb-16 group">
+                <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=1200" 
+                    class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
+                    alt="Phở Việt Nam">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            </div>
+
+            <article class="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-8 italic-quotes">
+                <p class="text-xl text-gray-900 font-medium leading-relaxed first-letter:text-7xl first-letter:font-black first-letter:text-red-600 first-letter:mr-3 first-letter:float-left">
+                    Phở không chỉ đơn thuần là một món ăn sáng phổ biến của người Việt, mà nó còn chứa đựng cả một hành trình lịch sử, văn hóa và tâm hồn của dân tộc Việt Nam qua bao thế hệ.
+                </p>
+
+                <h2 class="text-3xl font-black text-gray-900 pt-6 border-l-4 border-red-600 pl-6">Nguồn gốc của sự tinh tế</h2>
+                <p>
+                    Từ những gánh phở đêm ở phố cổ Hà Nội hay những xe phở bình dân trên vỉa hè Sài Gòn, phở luôn có một sức hút lạ kỳ. Nước dùng phở được ví như linh hồn của món ăn, là sự kết tinh của quá trình hầm xương ống tỉ mỉ suốt 24 giờ cùng các gia vị thảo mộc như quế, hồi, gừng nướng.
+                </p>
+
+                <blockquote class="bg-gray-900 text-white p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
+                    <span class="absolute -top-4 -left-2 text-9xl text-white/10 font-serif">“</span>
+                    <p class="relative z-10 text-2xl font-bold italic leading-relaxed">
+                        Ăn một tô phở ngon không chỉ là thưởng thức thực phẩm, mà là trải nghiệm một tác phẩm nghệ thuật của thời gian và lòng kiên nhẫn.
+                    </p>
+                    <cite class="relative z-10 block mt-4 text-red-400 font-bold">— Nghệ nhân ẩm thực</cite>
+                </blockquote>
+
+                <p>
+                    Người Việt ăn phở vào bất kỳ thời điểm nào trong ngày. Sáng sớm se lạnh với bát phở bốc khói nghi ngút, hay buổi đêm muộn sau giờ làm việc căng thẳng. Mỗi vùng miền lại có một cách thưởng thức khác nhau, nhưng cái tinh túy của nước dùng trong thanh vẫn luôn được gìn giữ.
+                </p>
+            </article>
+
+            <footer class="mt-16 pt-10 border-t border-gray-200">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-4 py-2 bg-white border rounded-xl text-sm font-bold text-gray-500 hover:text-red-600 hover:border-red-600 transition-all cursor-pointer">#Phovietnam</span>
+                        <span class="px-4 py-2 bg-white border rounded-xl text-sm font-bold text-gray-500 hover:text-red-600 hover:border-red-600 transition-all cursor-pointer">#Vanhuaamthuc</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm font-black uppercase tracking-widest text-gray-400">Chia sẻ:</span>
+                        <button class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:scale-110 transition-all">f</button>
+                        <button class="w-10 h-10 rounded-full bg-sky-400 text-white flex items-center justify-center hover:scale-110 transition-all">t</button>
+                        <button class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center hover:scale-110 transition-all">🔗</button>
+                    </div>
+                </div>
+            </footer>
+
+            <section class="mt-20 pt-16 border-t border-gray-100">
+                <div class="flex items-center justify-between mb-10">
+                    <h3 class="text-3xl font-black text-gray-900 tracking-tight">
+                        Thảo luận <span class="text-red-600 ml-1">(24)</span>
+                    </h3>
+                    <div class="flex items-center gap-2 text-sm font-bold text-gray-400 uppercase tracking-widest">
+                        <span>Sắp xếp:</span>
+                        <select class="bg-transparent border-none focus:ring-0 text-gray-900 cursor-pointer">
+                            <option>Mới nhất</option>
+                            <option>Cũ nhất</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 mb-12 group focus-within:shadow-xl focus-within:border-red-100 transition-all duration-500">
+                    <div class="flex gap-4">
+                        <div class="w-12 h-12 bg-gray-100 rounded-2xl flex-shrink-0 flex items-center justify-center text-gray-400 font-bold border-2 border-white shadow-sm">
+                            U
+                        </div>
+                        <div class="flex-1 space-y-4">
+                            <textarea rows="3" placeholder="Chia sẻ suy nghĩ của bạn về bài viết này..." 
+                                    class="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-red-500 outline-none transition-all resize-none shadow-inner"></textarea>
+                            <div class="flex justify-end">
+                                <button class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-3 rounded-xl shadow-lg shadow-red-100 transition-all transform hover:-translate-y-1 active:scale-95">
+                                    Gửi bình luận
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="flex gap-6 group">
+                        <div class="flex-shrink-0">
+                            <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-orange-400 rounded-2xl shadow-lg flex items-center justify-center text-white font-bold text-xl">
+                                T
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-white p-6 rounded-3xl rounded-tl-none border border-gray-50 shadow-sm group-hover:shadow-md transition-all">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-black text-gray-900">Trần Văn Bình</h4>
+                                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">2 giờ trước</span>
+                                </div>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Bài viết rất sâu sắc! Tôi cũng đồng cảm rằng nước dùng chính là "linh hồn" của phở. Hy vọng quán sẽ chia sẻ thêm về cách chọn gia vị thảo mộc chuẩn nhé.
+                                </p>
+                            </div>
+                            <div class="flex gap-6 mt-3 ml-2 text-xs font-black uppercase tracking-tighter text-gray-400">
+                                <button class="hover:text-red-600 transition-colors flex items-center gap-1">
+                                    <span>❤</span> Thích (5)
+                                </button>
+                                <button class="hover:text-red-600 transition-colors">Phản hồi</button>
+                            </div>
+
+                            <div class="mt-6 ml-6 border-l-2 border-red-50 pl-6 space-y-6">
+                                <div class="flex gap-4">
+                                    <div class="w-10 h-10 bg-gray-900 rounded-xl flex items-center justify-center text-white text-xs font-bold">
+                                        DT
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="bg-gray-100 p-5 rounded-2xl rounded-tl-none">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <h4 class="font-bold text-sm text-gray-900 uppercase">Nguyen Dinh Thiep</h4>
+                                                <span class="bg-red-600 text-[8px] text-white px-2 py-0.5 rounded-md font-black">Tác giả</span>
+                                            </div>
+                                            <p class="text-sm text-gray-600">Cảm ơn bạn Bình đã quan tâm. Trong bài viết tới mình sẽ hướng dẫn chi tiết cách nướng gừng và hành sao cho thơm nhất!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-6 group">
+                        <div class="flex-shrink-0">
+                            <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-2xl shadow-lg flex items-center justify-center text-white font-bold text-xl">
+                                H
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-white p-6 rounded-3xl rounded-tl-none border border-gray-50 shadow-sm group-hover:shadow-md transition-all">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-black text-gray-900">Hoàng Thu Hà</h4>
+                                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">5 giờ trước</span>
+                                </div>
+                                <p class="text-gray-600 leading-relaxed">
+                                    Hình ảnh đẹp quá, nhìn là muốn đi ăn phở ngay lập tức!
+                                </p>
+                            </div>
+                            <div class="flex gap-6 mt-3 ml-2 text-xs font-black uppercase tracking-tighter text-gray-400">
+                                <button class="hover:text-red-600 transition-colors flex items-center gap-1">
+                                    <span>❤</span> Thích
+                                </button>
+                                <button class="hover:text-red-600 transition-colors">Phản hồi</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <button class="px-10 py-4 bg-white border border-gray-200 rounded-2xl font-black text-xs uppercase tracking-widest text-gray-500 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all shadow-sm active:scale-95">
+                        Xem thêm bình luận
+                    </button>
+                </div>
+            </section>
+
+            <section class="mt-24">
+                <h3 class="text-2xl font-black text-gray-900 mb-10 flex items-center gap-4">
+                    Bài viết liên quan
+                    <div class="h-px bg-gray-200 flex-1"></div>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <a href="#" class="group flex gap-4 bg-white p-4 rounded-3xl border border-gray-100 hover:shadow-xl transition-all">
+                        <div class="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
+                            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-500">
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 group-hover:text-red-600 transition-colors line-clamp-2">10 loại rau gia vị không thể thiếu khi ăn phở</h4>
+                            <p class="text-xs text-gray-400 mt-2 font-bold uppercase">Tips • 05/01/2026</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+<div th:replace="~{layout/user/footer :: footer_section}"></div>
+<script src="/js/main.js"></script>
+</body>
+</html>

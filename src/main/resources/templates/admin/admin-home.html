@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phở Hầm - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #fcfcfd; 
+            color: #1a202c;
+        }
+        .sticky-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sticky-nav sticky top-0 z-50 border-b border-slate-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 bg-rose-600 rounded-2xl flex items-center justify-center text-white font-extrabold text-2xl shadow-lg shadow-rose-200">P</div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-xl font-extrabold tracking-tight">PHỞ HẦM</h1>
+                        <p class="text-[10px] text-rose-600 font-bold uppercase tracking-tighter">Hệ thống quản trị</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-5">
+                    <div class="hidden md:flex items-center bg-slate-100 px-4 py-2 rounded-xl border border-transparent focus-within:border-rose-300 focus-within:bg-white transition-all">
+                        <span class="text-slate-400">🔍</span>
+                        <input type="text" placeholder="Tìm kiếm nhanh..." class="bg-transparent border-none outline-none ml-2 text-sm w-48">
+                    </div>
+                    
+                    <button class="relative p-2 text-slate-500 hover:text-rose-600 transition-colors">
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                    </button>
+
+                    <div class="flex items-center gap-3 border-l pl-5 border-slate-200">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-bold leading-tight">Admin Thiep</p>
+                            <p class="text-[11px] text-slate-400 font-medium">Quản lý cấp cao</p>
+                        </div>
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=E11D48&color=fff" class="w-10 h-10 rounded-2xl shadow-sm border border-slate-100" alt="Admin">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 md:pb-4">
+                <a href="#" class="bg-rose-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-rose-200 whitespace-nowrap">Tổng quan</a>
+                <a href="#" class="text-slate-500 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap">Quản lý bàn</a>
+                <a href="#" class="text-slate-500 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap flex items-center gap-2">
+                    Đơn hàng <span class="bg-rose-100 text-rose-600 text-[10px] px-2 py-0.5 rounded-full">12</span>
+                </a>
+                <a href="#" class="text-slate-500 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap">Thực đơn</a>
+                <a href="#" class="text-slate-500 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap">Khách hàng</a>
+                <a href="#" class="text-slate-500 hover:bg-slate-50 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap">Báo cáo</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-10">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Dashboard</h2>
+                <p class="text-slate-500 font-medium mt-1">Chào Admin, hãy xem các hoạt động hôm nay của bạn.</p>
+            </div>
+            <div class="flex gap-2">
+                <button class="bg-white border border-slate-200 text-slate-600 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all flex items-center gap-2">
+                    📅 Ngày hôm nay
+                </button>
+                <button class="bg-slate-900 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
+                    + Xuất báo cáo
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
+            <div class="stat-card bg-white p-5 md:p-7 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-rose-50 rounded-full group-hover:scale-110 transition-transform"></div>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest relative">Doanh thu</p>
+                <h3 class="text-xl md:text-3xl font-extrabold mt-2 text-slate-800 relative">15.5M ₫</h3>
+                <div class="mt-4 flex items-center gap-1.5">
+                    <span class="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">↑ 12.5%</span>
+                    <span class="text-[10px] text-slate-400 font-medium">so với qua</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-5 md:p-7 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-blue-50 rounded-full group-hover:scale-110 transition-transform"></div>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest relative">Đơn hàng</p>
+                <h3 class="text-xl md:text-3xl font-extrabold mt-2 text-slate-800 relative">124</h3>
+                <div class="mt-4 flex items-center gap-1.5">
+                    <span class="text-[11px] font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">↑ 8.2%</span>
+                    <span class="text-[10px] text-slate-400 font-medium">hoàn tất</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-5 md:p-7 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-amber-50 rounded-full group-hover:scale-110 transition-transform"></div>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest relative">Bàn trống</p>
+                <h3 class="text-xl md:text-3xl font-extrabold mt-2 text-slate-800 relative">08 / 25</h3>
+                <div class="mt-4 flex items-center gap-1.5">
+                    <span class="text-[11px] font-extrabold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg">68%</span>
+                    <span class="text-[10px] text-slate-400 font-medium">công suất</span>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white p-5 md:p-7 rounded-[2.5rem] border border-slate-100 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-20 h-20 bg-purple-50 rounded-full group-hover:scale-110 transition-transform"></div>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest relative">Khách hàng</p>
+                <h3 class="text-xl md:text-3xl font-extrabold mt-2 text-slate-800 relative">2,543</h3>
+                <div class="mt-4 flex items-center gap-1.5">
+                    <span class="text-[11px] font-extrabold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-lg">+15</span>
+                    <span class="text-[10px] text-slate-400 font-medium">thành viên mới</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-white p-6 md:p-8 rounded-[3rem] border border-slate-100 shadow-sm">
+                <div class="flex justify-between items-center mb-10">
+                    <h4 class="font-bold text-xl flex items-center gap-3">
+                        <span class="w-1.5 h-6 bg-rose-600 rounded-full"></span>
+                        Hiệu suất doanh thu
+                    </h4>
+                    <div class="flex bg-slate-100 p-1 rounded-xl">
+                        <button class="px-3 py-1.5 text-xs font-bold bg-white rounded-lg shadow-sm">Tuần</button>
+                        <button class="px-3 py-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors">Tháng</button>
+                    </div>
+                </div>
+                <canvas id="revenueChart" height="140"></canvas>
+            </div>
+
+            <div class="bg-rose-600 p-8 rounded-[3rem] text-white shadow-2xl shadow-rose-200 relative overflow-hidden flex flex-col justify-between min-h-[300px]">
+                <div class="relative z-10">
+                    <span class="bg-white/20 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Tin tức hệ thống</span>
+                    <h4 class="text-2xl font-bold mt-4 leading-snug">Nâng cấp phiên bản v2.5</h4>
+                    <p class="text-rose-100 mt-3 text-sm leading-relaxed opacity-90 font-medium">
+                        Hệ thống đã cập nhật tính năng thanh toán tự động qua QR Code. Hãy kiểm tra cài đặt của bạn.
+                    </p>
+                </div>
+                <button class="relative z-10 w-full py-4 bg-white text-rose-600 rounded-2xl font-bold hover:bg-rose-50 transition-all shadow-lg shadow-rose-900/10 active:scale-95">
+                    Tìm hiểu ngay
+                </button>
+                
+                <div class="absolute -right-20 -top-20 w-60 h-60 bg-rose-500 rounded-full opacity-50"></div>
+                <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-rose-700 rounded-full opacity-30"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(225, 29, 72, 0.15)');
+        gradient.addColorStop(1, 'rgba(225, 29, 72, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+                datasets: [{
+                    label: 'Doanh thu (M)',
+                    data: [12, 18, 15, 25, 30, 42, 38],
+                    borderColor: '#e11d48',
+                    borderWidth: 5,
+                    tension: 0.45,
+                    fill: true,
+                    backgroundColor: gradient,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#e11d48',
+                    pointBorderWidth: 3,
+                    pointRadius: 0,
+                    pointHoverRadius: 8,
+                    pointHoverBorderWidth: 4
+                }]  
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { 
+                        grid: { display: false },
+                        border: { display: false },
+                        ticks: { font: { weight: 'bold', family: 'Plus Jakarta Sans' }, color: '#94a3b8' }
+                    },
+                    y: { 
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

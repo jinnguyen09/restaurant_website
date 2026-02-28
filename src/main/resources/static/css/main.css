@@ -1,0 +1,156 @@
+/* web */
+body { font-family: 'Saira', sans-serif; }
+h1, h2, h3, .font-title { font-family: 'Montserrat', sans-serif; }
+.hero-bg {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+        }
+.transition-soft { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+.nav-link.active {
+    color: #b91c1c;
+    border-bottom: 2px solid #b91c1c;
+    padding-bottom: 4px;
+}
+
+.nav-link {
+    position: relative;
+    padding-bottom: 4px;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #b91c1c;
+    transition: width 0.3s ease-in-out;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+@keyframes cart-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.hover-cart:hover i {
+    animation: cart-bounce 0.5s ease;
+}
+
+.btn-animate {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-nav-link {
+    position: relative;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: #b91c1c;
+    transition: width 0.3s ease;
+}
+
+.mobile-nav-link:hover::after {
+    width: 40px; 
+}
+
+.mobile-menu-item {
+    transition: transform 0.3s ease, padding-left 0.3s ease;
+}
+
+.mobile-menu-item:hover {
+    transform: translateX(8px);
+    color: #b91c1c;
+}
+
+.mobile-nav-link.active {
+    color: #b91c1c !important; 
+}
+
+.mobile-menu-item:has(> .active) {
+    transform: translateX(10px);
+    /* transition: transform 0.3s ease; */
+}
+
+.mobile-nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; /* Khoảng cách giữa chữ và gạch chân */
+    left: 0;
+    width: 40px; /* Độ dài gạch chân */
+    height: 2px; /* Độ dày gạch chân */
+    background-color: #b91c1c; /* Màu gạch chân trùng với màu chữ */
+    border-radius: 2px;
+}
+
+/* Thêm một chút Animation CSS */
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.animate-fadeInRight {
+    animation: fadeInRight 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+
+@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes zoomIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shimmer {
+        100% { transform: translateX(100%); }
+    }
+
+    .animate-fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
+    .animate-slideDown { animation: slideDown 0.6s ease-out forwards; }
+    .animate-zoomIn { animation: zoomIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-fadeIn { animation: fadeInUp 0.8s ease-out forwards; }
+    
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-700 { animation-delay: 0.7s; }
+
+    /* Hiệu ứng nền hero nếu bạn muốn mượt hơn */
+    .hero-bg {
+        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/img/anh-pho.jpg');
+        background-size: cover;
+        background-position: center;
+        transition: background-scale 10s ease-in-out;
+        /* Căn chỉnh ảnh nền lên cao và thấp */
+        background-position: center 40%;
+    }
+    .hero-bg:hover {
+        background-size: 105%; /* Hiệu ứng zoom nền nhẹ khi hover toàn vùng */
+    }

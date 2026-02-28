@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thực đơn - Phở Hầm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Saira:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 index-page">
+
+    <div th:replace="~{layout/user/navbar :: header}"></div>
+
+    <main class="main">
+        <header id="hero" class="text-center py-16 animate-fadeIn">
+                <h1 class="text-5xl font-black text-gray-900 mb-4">THỰC <span class="text-red-600">ĐƠN</span></h1>
+                <p class="text-gray-500 text-lg max-w-2xl mx-auto italic">
+                    Khám phá các món ăn đặc sắc của chúng tôi.
+                </p>
+            </header>
+
+        <section id="menu" class="pb-24 bg-gray-50">
+            <div class="flex flex-wrap justify-center gap-4 mb-16 px-4">
+                <button class="px-8 py-3 rounded-full bg-red-600 text-white font-bold shadow-lg shadow-red-200 transition-all scale-105">Tất cả</button>
+                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Phở</button>
+                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Bánh mì</button>
+                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Đồ uống</button>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] transition-all duration-500 group border border-gray-50">
+                        
+                        <div class="relative h-72 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800" 
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                                alt="Phở Bò Tái">
+                            
+                            <div class="absolute top-5 right-5 bg-red-600/90 backdrop-blur-sm text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg">
+                                🔥 Phổ biến
+                            </div>
+                        </div>
+
+                        <div class="p-10">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="text-2xl font-extrabold text-gray-800 group-hover:text-red-700 transition-colors">Phở Bò Tái</h3>
+                                <div class="flex items-center text-yellow-400 text-sm">
+                                    ★ <span class="text-gray-500 ml-1 font-bold">4.8</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-500 text-base mb-8 leading-relaxed line-clamp-2">
+                                Phở bò với thịt bò tái mềm, nước dùng được ninh từ xương ống trong 24 giờ, thơm ngon đặc trưng.
+                            </p>
+
+                            <div class="flex justify-between items-center pt-4 border-t border-gray-50">
+                                <div>
+                                    <span class="block text-gray-400 text-xs uppercase tracking-wider font-bold mb-1">Giá từ</span>
+                                    <span class="text-red-600 font-black text-2xl">65.000đ</span>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <a href="food-detail" class="inline-flex items-center justify-center text-sm font-bold border-2 border-gray-100 px-6 py-3 rounded-2xl hover:bg-gray-900 hover:border-gray-900 hover:text-white transition-all duration-300 active:scale-95">
+                                        Chi tiết
+                                    </a>
+                                    
+                                    <button class="bg-red-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-red-700 transition-all duration-300 shadow-lg shadow-red-100 active:scale-90">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="book-a-table" class="py-20 bg-gray-100 text-center">
+            <h2 class="text-3xl font-bold uppercase">Đặt món ngay</h2>
+        </section>
+    </main>
+
+    <div th:replace="~{layout/user/footer :: footer_section}"></div>
+    <script src="/js/main.js"></script>
+</body>
+</html>

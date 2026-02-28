@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mua sắm - Phở Hầm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Saira:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 index-page">
+
+<div th:replace="~{layout/user/navbar :: header}"></div>
+
+<main class="main">
+        <header id="hero" class="text-center py-16 animate-fadeIn">
+            <h1 class="text-5xl font-black text-gray-900 mb-4">THỰC PHẨM <span class="text-red-600">KHÔ</span></h1>
+            <p class="text-gray-500 text-lg max-w-2xl mx-auto italic">
+                Đặc sản vùng miền - Đóng gói tinh tế - Chất lượng tuyệt hảo.
+            </p>
+        </header>
+
+        <section id="menu" class="pb-24 bg-gray-50">
+            <div class="flex flex-wrap justify-center gap-4 mb-16 px-4">
+                <button class="px-8 py-3 rounded-full bg-red-600 text-white font-bold shadow-lg shadow-red-200 transition-all scale-105">Tất cả</button>
+                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Thịt khô</button>
+                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Hạt dinh dưỡng</button>
+                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Trái cây sấy</button>
+                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Gia vị khô</button>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    
+                    <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] transition-all duration-500 group border border-gray-50">
+                        <div class="relative h-72 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=800" 
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                                alt="Thịt Trâu Gác Bếp">
+                            <div class="absolute top-5 right-5 bg-amber-500 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg">
+                                📦 Đóng gói hút chân không
+                            </div>
+                        </div>
+
+                        <div class="p-10">
+                            <div class="flex justify-between items-start mb-3">
+                                <h3 class="text-2xl font-extrabold text-gray-800 group-hover:text-red-700 transition-colors">Thịt Trâu Gác Bếp</h3>
+                                <div class="flex items-center text-yellow-400 text-sm">
+                                    ★ <span class="text-gray-500 ml-1 font-bold">4.9</span>
+                                </div>
+                            </div>
+                            
+                            <p class="text-gray-500 text-sm mb-8 leading-relaxed line-clamp-2">
+                                Thịt trâu tươi Tây Bắc được hun khói bằng củi nhãn, đậm đà gia vị mắc khén, hạt dổi.
+                            </p>
+
+                            <div class="mb-6 flex gap-4">
+                                <span class="text-[11px] bg-gray-100 px-3 py-1 rounded-md text-gray-600 font-bold tracking-wider">HSD: 6 THÁNG</span>
+                                <span class="text-[11px] bg-gray-100 px-3 py-1 rounded-md text-gray-600 font-bold tracking-wider">TL: 500G</span>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-4 border-t border-gray-50">
+                                <div>
+                                    <span class="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">Giá túi</span>
+                                    <span class="text-red-600 font-black text-2xl">450.000đ</span>
+                                </div>
+                                
+                                <div class="flex gap-3">
+                                    <button class="bg-red-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-red-700 transition-all duration-300 shadow-lg shadow-red-100 active:scale-90">
+                                        <i class="fa-solid fa-cart-shopping"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+            </div>
+        </section>
+
+        <section id="cta" class="py-20 bg-gray-900 text-center rounded-t-[3rem]">
+            <h2 class="text-3xl font-bold text-white uppercase tracking-widest mb-4">Giao hàng trong khu vực</h2>
+            <p class="text-gray-400 mb-8 px-4">Nhận hàng đúng giờ. Kiểm tra hàng trước khi thanh toán.</p>
+            <button class="bg-red-600 text-white px-10 py-4 rounded-full font-bold hover:bg-red-700 transition-all shadow-xl shadow-red-900/20">Đặt hàng ngay</button>
+        </section>
+    </main>
+
+<div th:replace="~{layout/user/footer :: footer_section}"></div>
+<script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+package restaurant.controller.user;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@Controller
+public class MarketController {
+    @GetMapping("/market")
+    public String Market(Model model) {
+        model.addAttribute("page", "market");
+        return "user/market";
+    }
+}

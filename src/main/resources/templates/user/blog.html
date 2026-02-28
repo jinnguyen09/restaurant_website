@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Phở Hầm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Saira:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 index-page">
+
+<div th:replace="~{layout/user/navbar :: header}"></div>
+
+    <main class="bg-gray-50 min-h-screen py-16 px-4 font-sans text-gray-900">
+        <div class="max-w-7xl mx-auto">
+            <header class="text-center mb-16 animate-fadeIn">
+                <h1 class="text-5xl font-black text-gray-900 mb-4">GÓC <span class="text-red-600">ẨM THỰC</span></h1>
+                <p class="text-gray-500 text-lg max-w-2xl mx-auto italic">
+                    Nơi chia sẻ những câu chuyện về văn hóa, bí quyết nấu ăn và những tin tức mới nhất từ chúng tôi.
+                </p>
+            </header>
+
+            <div class="flex flex-wrap justify-center gap-3 mb-16">
+                <button class="px-6 py-2 rounded-xl bg-gray-900 text-white font-bold shadow-lg transition-all hover:scale-105">Tất cả bài viết</button>
+                <button class="px-6 py-2 rounded-xl bg-white border border-gray-100 text-gray-600 font-bold hover:text-red-600 hover:border-red-600 transition-all shadow-sm">Văn hóa</button>
+                <button class="px-6 py-2 rounded-xl bg-white border border-gray-100 text-gray-600 font-bold hover:text-red-600 hover:border-red-600 transition-all shadow-sm">Công thức</button>
+                <button class="px-6 py-2 rounded-xl bg-white border border-gray-100 text-gray-600 font-bold hover:text-red-600 hover:border-red-600 transition-all shadow-sm">Tin tức</button>
+                <button class="px-6 py-2 rounded-xl bg-white border border-gray-100 text-gray-600 font-bold hover:text-red-600 hover:border-red-600 transition-all shadow-sm">Mẹo vặt</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                
+                <article class="group bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.12)] transition-all duration-500 border border-gray-50 flex flex-col h-full">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800" 
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                            alt="Lịch sử phở">
+                        <span class="absolute top-6 left-6 bg-red-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg uppercase tracking-widest shadow-lg">Văn hóa</span>
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <div class="flex items-center gap-4 text-xs text-gray-400 mb-4 font-bold uppercase tracking-tighter">
+                            <span class="flex items-center gap-1">👤 Nguyen Dinh Thiep</span>
+                            <span>•</span>
+                            <span>📅 10/01/2026</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-800 mb-4 leading-tight group-hover:text-red-600 transition-colors">
+                            Lịch sử và văn hóa ẩm thực Việt Nam qua tô phở
+                        </h3>
+                        <p class="text-gray-500 text-sm leading-relaxed mb-8 line-clamp-3">
+                            Phở không chỉ là một món ăn, mà còn là biểu tượng văn hóa đậm chất Việt Nam, mang trong mình câu chuyện của lịch sử và sự tinh tế trong cách chế biến...
+                        </p>
+                        <a href="post-detail" class="mt-auto inline-flex items-center font-black text-sm text-gray-900 group-hover:text-red-600 transition-all group-hover:translate-x-2">
+                            Đọc tiếp <span class="ml-2 text-xl">→</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="group bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.12)] transition-all duration-500 border border-gray-50 flex flex-col h-full">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800" 
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                            alt="Rau gia vị">
+                        <span class="absolute top-6 left-6 bg-amber-500 text-white text-[10px] font-black px-4 py-1.5 rounded-lg uppercase tracking-widest shadow-lg">Tips</span>
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <div class="flex items-center gap-4 text-xs text-gray-400 mb-4 font-bold uppercase tracking-tighter">
+                            <span class="flex items-center gap-1">👤 Chef Thiep</span>
+                            <span>•</span>
+                            <span>📅 05/01/2026</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-800 mb-4 leading-tight group-hover:text-red-600 transition-colors">
+                            10 loại rau gia vị không thể thiếu khi ăn phở
+                        </h3>
+                        <p class="text-gray-500 text-sm leading-relaxed mb-8 line-clamp-3">
+                            Tìm hiểu về các loại rau thơm làm nên hương vị đặc trưng của tô phở Việt, từ húng quế, ngò gai đến hành hoa tươi rói...
+                        </p>
+                        <a href="post-detail" class="mt-auto inline-flex items-center font-black text-sm text-gray-900 group-hover:text-red-600 transition-all group-hover:translate-x-2">
+                            Đọc tiếp <span class="ml-2 text-xl">→</span>
+                        </a>
+                    </div>
+                </article>
+
+                <article class="group bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.12)] transition-all duration-500 border border-gray-50 flex flex-col h-full">
+                    <div class="relative h-64 overflow-hidden">
+                        <img src="/img/anh-long.jpg" 
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                            alt="Cà phê phin">
+                        <span class="absolute top-6 left-6 bg-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-lg uppercase tracking-widest shadow-lg">Đồ uống</span>
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <div class="flex items-center gap-4 text-xs text-gray-400 mb-4 font-bold uppercase tracking-tighter">
+                            <span class="flex items-center gap-1">👤 Đình Thiệp</span>
+                            <span>•</span>
+                            <span>📅 01/01/2026</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-gray-800 mb-4 leading-tight group-hover:text-red-600 transition-colors">
+                            Cà phê phin Việt Nam - Nghệ thuật pha chế truyền thống
+                        </h3>
+                        <p class="text-gray-500 text-sm leading-relaxed mb-8 line-clamp-3">
+                            Khám phá nghệ thuật pha cà phê phin đậm đà hương vị Việt Nam, sự kiên nhẫn trong từng giọt cà phê rơi tạo nên một nét văn hóa độc đáo...
+                        </p>
+                        <a href="post-detail" class="mt-auto inline-flex items-center font-black text-sm text-gray-900 group-hover:text-red-600 transition-all group-hover:translate-x-2">
+                            Đọc tiếp <span class="ml-2 text-xl">→</span>
+                        </a>
+                    </div>
+                </article>
+
+            </div>
+
+            <div class="mt-20 flex justify-center gap-2">
+                <button class="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center font-bold hover:bg-gray-900 hover:text-white transition-all">1</button>
+                <button class="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold shadow-lg shadow-red-100">2</button>
+                <button class="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center font-bold hover:bg-gray-900 hover:text-white transition-all">3</button>
+                <button class="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center font-bold hover:bg-gray-900 hover:text-white transition-all">→</button>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{layout/user/footer :: footer_section}"></div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

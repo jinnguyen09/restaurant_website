@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng kí - Phở Hầm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Saira:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 index-page">
+
+    <main class="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-orange-100 py-12 px-4 font-sans">
+        <div class="max-w-md w-full bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] p-10 md:p-12 border border-white/50 backdrop-blur-sm animate-fadeIn">
+
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-black text-red-800 mb-2 tracking-tight">Đăng ký</h1>
+                <p class="text-gray-500 font-medium text-sm">Tạo tài khoản để nhận ưu đãi đặc biệt</p>
+
+                <div class="mt-4 inline-flex items-center gap-2 bg-gradient-to-r from-amber-100 to-yellow-200 px-4 py-2 rounded-xl border border-amber-200 shadow-sm animate-pulse">
+                    <span class="text-lg">🎁</span>
+                    <span class="text-xs font-black text-amber-800 uppercase tracking-wider">Nhận ngay 50 điểm thưởng</span>
+                </div>
+            </div>
+
+            <form th:action="@{/sign-up}" th:object="${user}" method="POST" class="space-y-5">
+
+                <div th:if="${error}" class="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-xl text-xs font-bold text-center">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> <span th:text="${error}"></span>
+                </div>
+
+                <div class="group">
+                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1 group-focus-within:text-red-600 transition-colors">Họ và tên</label>
+                    <div class="relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">👤</span>
+                        <label>
+                            <input type="text" th:field="*{fullName}" placeholder="Nguyen Dinh Thiep" required
+                                   class="w-full pl-12 pr-6 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all shadow-inner">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1 group-focus-within:text-red-600 transition-colors">Email</label>
+                    <div class="relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">✉</span>
+                        <label>
+                            <input type="email" th:field="*{email}" placeholder="email@example.com" required
+                                   class="w-full pl-12 pr-6 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all shadow-inner">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1 group-focus-within:text-red-600 transition-colors">Số điện thoại</label>
+                    <div class="relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-red-500 transition-colors">📞</span>
+                        <label>
+                            <input type="tel" th:field="*{phone}" placeholder="0123456789" required
+                                   class="w-full pl-12 pr-6 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/10 outline-none transition-all shadow-inner">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Mật khẩu</label>
+                    <div class="relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">🔒</span>
+                        <input type="password" th:field="*{password}" id="password" placeholder="••••••••" required
+                               class="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-red-500 outline-none transition-all shadow-inner">
+
+                        <button type="button" onclick="togglePassword('password', 'eye-icon1')"
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors">
+                            <i id="eye-icon1" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Xác nhận mật khẩu</label>
+                    <div class="relative">
+                        <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">🛡️</span>
+                        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="••••••••" required
+                               class="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-red-500 outline-none transition-all shadow-inner">
+
+                        <button type="button" onclick="togglePassword('confirmPassword', 'eye-icon2')"
+                                class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors">
+                            <i id="eye-icon2" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-red-100 transition-all transform hover:-translate-y-1 active:scale-[0.98] mt-4">
+                    Đăng ký tài khoản
+                </button>
+            </form>
+
+            <div class="mt-8 text-center pt-6 border-t border-gray-100">
+                <p class="text-sm text-gray-500 font-medium">
+                    Đã có tài khoản?
+                    <a th:href="@{/sign-in}" class="text-red-600 font-black hover:underline underline-offset-4 ml-1">Đăng nhập ngay</a>
+                </p>
+            </div>
+        </div>
+    </main>
+    <script src="/js/main.js"></script>
+    <script>
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

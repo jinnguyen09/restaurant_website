@@ -27,8 +27,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/", "/home", "/sign-in", "/sign-up").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/img/**").permitAll()
+                        .requestMatchers("/admin/**").hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers("/", "/home","/menu","/reservation","/market","/blog","/contact","/sign-in","/sign-up").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
@@ -45,7 +46,6 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
-
         return http.build();
     }
 }

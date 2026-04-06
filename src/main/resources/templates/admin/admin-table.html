@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Quản Trị - PHỞ HẨM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="/css/admin.css" rel="stylesheet">
+  <style>
+    .table-info-bar {
+      padding: 8px;
+      text-align: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .table-detail { padding: 15px; background: white; }
+
+    /* Thẻ thống kê */
+    .summary-card {
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+    }
+    .summary-icon {
+      width: 45px; height: 45px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-right: 15px; font-size: 1.2rem;
+    }
+
+    /* Modal styling */
+    .modal-content { border-radius: 20px; border: none; }
+    .modal-header { border-bottom: none; }
+    .order-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    :root {
+      --status-free: #00b894;
+      --status-serving: #ff0032;
+      --status-reserved: #f39c12;
+    }
+
+    /* Thẻ bàn thiết kế theo hình */
+    .table-card {
+      border: none;
+      border-radius: 24px;
+      background: white;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      cursor: pointer;
+      border: 1px solid #eee;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    /* Hiệu ứng Hover nổi khối */
+    .table-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      border-color: rgba(0,0,0,0.05);
+    }
+
+    /* Phần màu phía trên */
+    .table-thumb {
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin: 10px;
+      border-radius: 20px;
+    }
+
+    .table-thumb i { font-size: 2.5rem; margin-bottom: 8px; opacity: 0.9; }
+    .table-thumb h3 { font-weight: 700; margin: 0; }
+
+    /* Thanh trạng thái nhỏ bo tròn */
+    .status-pill {
+      margin: 0 15px;
+      padding: 6px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    /* Chi tiết thông tin khách hàng */
+    .table-detail {
+      padding: 15px 20px 20px;
+      min-height: 110px;
+    }
+
+    .table-detail .guest-name { font-weight: 700; color: #333; margin-bottom: 2px; }
+    .table-detail .guest-info { font-size: 0.85rem; color: #666; margin-bottom: 4px; }
+    .table-detail .time-info { font-size: 0.85rem; color: #999; }
+
+    /* Màu sắc động */
+    .bg-free { background-color: var(--status-free); }
+    .bg-serving { background-color: var(--status-serving); }
+    .bg-reserved { background-color: var(--status-reserved); }
+
+    /* Shadow cho phần thumb giống hình */
+    .table-thumb.bg-serving { box-shadow: 0 10px 20px rgba(255, 0, 50, 0.2); }
+    .table-thumb.bg-free { box-shadow: 0 10px 20px rgba(0, 184, 148, 0.2); }
+  </style>
+</head>
+<body>
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='table')}"></div>
+<main class="container my-4">
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="summary-card bg-white shadow-sm">
+        <div class="summary-icon bg-primary bg-opacity-10 text-primary"><i class="fa-solid fa-utensils"></i></div>
+        <div><small class="text-secondary">Tổng số bàn</small><h4 class="fw-bold m-0">12</h4></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="summary-card bg-white shadow-sm">
+        <div class="summary-icon bg-success bg-opacity-10 text-success"><i class="fa-solid fa-circle-check"></i></div>
+        <div><small class="text-secondary">Bàn trống</small><h4 class="fw-bold m-0 text-success">6</h4></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="summary-card bg-white shadow-sm">
+        <div class="summary-icon bg-danger bg-opacity-10 text-danger"><i class="fa-solid fa-users"></i></div>
+        <div><small class="text-secondary">Đang phục vụ</small><h4 class="fw-bold m-0 text-danger">4</h4></div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="summary-card bg-white shadow-sm">
+        <div class="summary-icon bg-warning bg-opacity-10 text-warning"><i class="fa-solid fa-clock"></i></div>
+        <div><small class="text-secondary">Đã đặt</small><h4 class="fw-bold m-0 text-warning">2</h4></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+    <button class="btn btn-danger rounded-pill px-4">Tất cả khu vực</button>
+    <button class="btn btn-outline-secondary bg-red rounded-pill px-4">🏠 Khu trong nhà</button>
+    <button class="btn btn-outline-secondary bg-red rounded-pill px-4">🌳 Khu ngoài trời</button>
+    <button class="btn btn-outline-secondary bg-red rounded-pill px-4">👑 Khu VIP</button>
+  </div>
+
+  <div class="row g-4">
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="table-card" data-bs-toggle="modal" data-bs-target="#modalFree">
+        <div class="table-thumb bg-free">
+          <i class="fa-solid fa-utensils"></i>
+          <h3>Bàn 1</h3>
+          <small><i class="fa-solid fa-user-group me-1"></i> 2 chỗ</small>
+        </div>
+        <div class="status-pill bg-free">Trống</div>
+        <div class="table-detail text-center">
+          <div class="time-info mt-2">Sẵn sàng phục vụ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="table-card" style="border: 2px solid #ff0032;" data-bs-toggle="modal" data-bs-target="#modalServing">
+        <div class="table-thumb bg-serving">
+          <i class="fa-solid fa-utensils"></i>
+          <h3>Bàn 2</h3>
+          <small><i class="fa-solid fa-user-group me-1"></i> 4 chỗ</small>
+        </div>
+        <div class="status-pill bg-serving">Đang phục vụ</div>
+        <div class="table-detail">
+          <div class="guest-name">Nguyễn Văn A</div>
+          <div class="guest-info">0123456789</div>
+          <div class="time-info"><i class="fa-regular fa-clock me-1"></i> 18:30</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="table-card" data-bs-toggle="modal" data-bs-target="#modalReserved">
+        <div class="table-thumb bg-reserved">
+          <i class="fa-solid fa-utensils"></i>
+          <h3>Bàn 3</h3>
+          <small><i class="fa-solid fa-user-group me-1"></i> 4 chỗ</small>
+        </div>
+        <div class="status-pill bg-reserved">Đã đặt</div>
+        <div class="table-detail">
+          <div class="guest-name">Trần Thị B</div>
+          <div class="guest-info">0987654321</div>
+          <div class="time-info"><i class="fa-regular fa-clock me-1"></i> 19:00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="table-card" style="border: 2px solid #ff0032;" data-bs-toggle="modal" data-bs-target="#modalServing">
+        <div class="table-thumb bg-serving">
+          <i class="fa-solid fa-utensils"></i>
+          <h3>Bàn 4</h3>
+          <small><i class="fa-solid fa-user-group me-1"></i> 6 chỗ</small>
+        </div>
+        <div class="status-pill bg-serving">Đang phục vụ</div>
+        <div class="table-detail">
+          <div class="guest-name">Lê Văn C</div>
+          <div class="guest-info">0369852147</div>
+          <div class="time-info"><i class="fa-regular fa-clock me-1"></i> 17:45</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="modal fade" id="modalFree" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Bàn số 1 <span class="badge bg-success ms-2">Trống</span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center py-5">
+        <div class="text-success fs-1 mb-3"><i class="fa-solid fa-circle-check"></i></div>
+        <h4 class="fw-bold">Bàn đang trống</h4>
+        <p class="text-muted">Bàn này có 2 chỗ ngồi và sẵn sàng phục vụ</p>
+        <button class="btn btn-danger px-5 rounded-pill mt-3">Mở bàn mới</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalServing" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white rounded-top-20">
+        <h5 class="modal-title fw-bold">Bàn số 2 <span class="badge bg-white text-danger ms-2">Đang phục vụ</span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row mb-4 bg-light p-3 rounded-3">
+          <div class="col-md-6 border-end">
+            <small class="text-muted">Tên khách hàng</small>
+            <p class="fw-bold m-0">Nguyễn Văn A</p>
+            <small class="text-muted">Email</small>
+            <p class="m-0">nguyenvana@email.com</p>
+          </div>
+          <div class="col-md-6 ps-md-4">
+            <small class="text-muted">Số điện thoại</small>
+            <p class="fw-bold m-0">0123456789</p>
+            <small class="text-muted">Giờ vào</small>
+            <p class="m-0">18:30</p>
+          </div>
+        </div>
+
+        <h6 class="fw-bold mb-3"><i class="fa-solid fa-bowl-food text-danger me-2"></i>Danh sách món đã gọi</h6>
+        <div class="order-item d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-bold">Phở Bò Tái</div>
+            <small class="text-muted">65.000đ x 2</small>
+          </div>
+          <div class="fw-bold text-danger">130.000đ</div>
+        </div>
+        <div class="order-item d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-bold">Cà Phê Sữa Đá</div>
+            <small class="text-muted">25.000đ x 2</small>
+          </div>
+          <div class="fw-bold text-danger">50.000đ</div>
+        </div>
+
+        <hr>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="fw-bold m-0">Tổng cộng:</h4>
+          <h3 class="fw-bold text-danger m-0">190.000đ</h3>
+        </div>
+        <button class="btn btn-success w-100 py-3 rounded-3 fw-bold fs-5 shadow-sm">
+          <i class="fa-solid fa-dollar-sign me-2"></i> Thanh toán ngay
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalReserved" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Bàn số 3 <span class="badge bg-warning text-dark ms-2">Đã đặt</span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="bg-warning bg-opacity-10 p-4 rounded-4 mb-3 text-center">
+          <i class="fa-solid fa-calendar-check text-warning fs-1 mb-2"></i>
+          <h5 class="fw-bold m-0">Thông tin đặt bàn</h5>
+        </div>
+        <div class="row g-3">
+          <div class="col-6">
+            <small class="text-muted">Khách hàng</small>
+            <p class="fw-bold mb-2">Trần Thị B</p>
+            <small class="text-muted">Email</small>
+            <p class="mb-0 small">tranthib@email.com</p>
+          </div>
+          <div class="col-6">
+            <small class="text-muted">Điện thoại</small>
+            <p class="fw-bold mb-2">0987654321</p>
+            <small class="text-muted">Giờ đặt</small>
+            <p class="mb-0 fw-bold text-warning">19:00</p>
+          </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-outline-danger w-100">Hủy đặt bàn</button>
+          <button class="btn btn-danger w-100">Nhận bàn</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

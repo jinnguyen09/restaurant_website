@@ -1,16 +1,38 @@
 <header th:fragment="header" id="header" class="header sticky top-0 z-[100]" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <meta name="_csrf" th:if="${_csrf}" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:if="${_csrf}" th:content="${_csrf.headerName}"/>
     <nav class="bg-white/95 backdrop-blur-md py-3 px-6 md:px-20 flex justify-between items-center shadow-sm">
         <a th:href="@{/home}" class="flex items-center gap-2">
             <div class="flex items-center gap-2">
                 <div class="bg-yellow-500 p-2 rounded">
-                    <span class="text-white font-bold">PHỞ HẦM</span>
+                    <span class="text-white font-bold">HUONG VIET</span>
                 </div>
                 <div class="hidden md:block">
-                    <h1 class="text-red-700 font-bold leading-none">PHỞ HẦM</h1>
-                    <p class="text-[10px] text-gray-500">Real Vietnamese Noodles</p>
+                    <h1 class="text-red-700 font-bold leading-none">HƯƠNG VIỆT</h1>
+                    <p class="text-[10px] text-gray-500">Real Vietnamese Restaurants</p>
                 </div>
             </div>
         </a>
+
+        <div class="relative group ml-4">
+            <button class="flex items-center gap-2 text-sm font-bold text-red-700 bg-red-50 px-3 py-1.5 rounded-full border border-red-100">
+                <i class="fa-solid fa-location-dot"></i>
+                <span th:text="${currentBranch != null ? currentBranch.name : 'Chọn chi nhánh'}">Chi nhánh</span>
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+            </button>
+
+            <div class="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[110]">
+                <div class="p-2">
+                    <a th:each="b : ${branches}"
+                       th:href="@{'/select-branch/' + ${b.restaurantId}}"
+                       class="flex flex-col p-3 hover:bg-red-50 rounded-xl transition-all mb-1"
+                       th:classappend="${currentBranch?.restaurantId == b.restaurantId} ? 'bg-red-50 border-l-4 border-red-600' : ''">
+                        <span class="text-sm font-bold text-gray-800" th:text="${b.name}">Tên chi nhánh</span>
+                        <span class="text-[10px] text-gray-500" th:text="${b.address}">Địa chỉ</span>
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <div id="navmenu" class="navmenu">
             <ul class="hidden lg:flex gap-6 text-[13px] font-semibold uppercase tracking-wide">
@@ -35,32 +57,49 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-gray-600 group-hover:text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
-                        <span class="absolute top-1 right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white animate-pulse">2</span>
+                        <span th:if="${unreadCount > 0}"
+                              th:text="${unreadCount}"
+                              class="absolute top-1 right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white animate-pulse">0</span>
                     </div>
+
                     <div class="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 transform origin-top-right group-hover:translate-y-0 translate-y-2">
                         <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                             <span class="font-black text-gray-900">Thông báo</span>
                             <a th:href="@{/notification}" class="text-xs text-red-600 font-bold hover:underline">Xem tất cả</a>
                         </div>
+
                         <div class="max-h-64 overflow-y-auto">
-                            <div class="p-4 hover:bg-red-50 border-b border-gray-50 cursor-pointer">
-                                <p class="text-sm font-bold text-gray-800">🎉 Đặt bàn thành công!</p>
-                                <p class="text-xs text-gray-500 mt-1">Yêu cầu lúc 19:00 đã được xác nhận.</p>
+                            <div th:each="noti : ${topNotifications}"
+                                 class="p-4 hover:bg-red-50 border-b border-gray-50 cursor-pointer transition-colors">
+                                <p class="text-sm font-bold text-gray-800" th:text="${noti.title}">Tiêu đề thông báo</p>
+                                <p class="text-xs text-gray-500 mt-1" th:text="${noti.content}">Nội dung thông báo...</p>
+                                <p class="text-[10px] text-gray-400 mt-2"
+                                   th:text="${#temporals.format(noti.createAt, 'dd/MM/yyyy HH:mm')}">01/01/2024</p>
+                            </div>
+
+                            <div th:if="${#lists.isEmpty(topNotifications)}" class="p-8 text-center">
+                                <p class="text-sm text-gray-400">Bạn chưa có thông báo nào</p>
                             </div>
                         </div>
                     </div>
-                </div>
+            </div>
 
                 <div class="relative group">
-                    <button class="flex items-center gap-3 p-1.5 pr-4 rounded-2xl hover:bg-gray-50 transition-all duration-300">
-                        <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500">
-                            <i class="fa-solid fa-user"></i>
+                    <button class="flex items-center gap-3 p-1.5 pr-4 rounded-2xl hover:bg-gray-50 transition-all duration-300 min-w-0">
+                        <div class="w-10 h-10 bg-red-600 rounded-xl flex-shrink-0 flex items-center justify-center text-white overflow-hidden shadow-sm">
+                            <img th:if="${#authentication.principal.avatar != null}"
+                                 th:src="${#authentication.principal.avatar}"
+                                 class="w-full h-full object-cover">
+                            <i th:unless="${#authentication.principal.avatar != null}" class="fa-solid fa-user text-sm"></i>
                         </div>
-                        <div class="text-left hidden sm:block">
-                            <p class="text-sm font-black text-gray-900 uppercase tracking-tight leading-none"
-                               sec:authentication="principal.fullName">User</p>
+
+                        <div class="text-left hidden sm:block min-w-0">
+                            <p class="text-sm font-black text-gray-900 uppercase tracking-tight leading-none truncate max-w-[120px]"
+                               th:text="${#authentication.principal.fullName}"
+                               th:title="${#authentication.principal.fullName}">User</p>
                         </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 group-hover:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 group-hover:rotate-180 transition-transform flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </button>
@@ -71,7 +110,9 @@
                                 <span class="text-lg opacity-60">👤</span> Hồ sơ
                             </a>
 
-                            <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{admin/home}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
+                            <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_STAFF')"
+                               th:href="@{/admin/home}"
+                               class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
                                 <span class="text-lg">👑</span> Quản trị viên
                             </a>
 
@@ -119,22 +160,31 @@
             <ul class="flex flex-col gap-1 overflow-y-auto pr-2">
 
                 <li sec:authorize="isAuthenticated()" class="bg-gray-50 rounded-[2.5rem] border border-gray-100 p-3 mb-8 shadow-sm">
-                    <div class="flex items-center justify-between p-4 border-b border-white">
-                        <div class="flex items-center gap-4">
-                        <span class="w-14 h-14 bg-red-600 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg shadow-red-100">
-                            <i class="fa-solid fa-user"></i>
-                        </span>
-                            <div>
-                                <h4 class="text-lg font-black text-gray-900 leading-tight"
-                                    sec:authentication="principal.fullName">User Name</h4>
+                    <div class="flex items-center justify-between p-4 border-b border-white min-w-0">
+                        <div class="flex items-center gap-4 min-w-0">
+                            <span class="w-14 h-14 bg-red-600 rounded-2xl flex-shrink-0 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-red-100 overflow-hidden">
+                                <img th:if="${#authentication.principal.avatar != null}"
+                                     th:src="${#authentication.principal.avatar}"
+                                     class="w-full h-full object-cover">
+
+                                <i th:unless="${#authentication.principal.avatar != null}" class="fa-solid fa-user"></i>
+                            </span>
+                            <div class="min-w-0">
+                                <h4 class="text-lg font-black text-gray-900 leading-tight truncate max-w-[140px]"
+                                    th:text="${#authentication.principal.fullName}"
+                                    th:title="${#authentication.principal.fullName}">
+                                    User Name
+                                </h4>
                             </div>
                         </div>
 
-                        <button class="relative p-3 bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-red-50 transition-colors">
+                        <button class="relative p-3 bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-red-50 transition-colors flex-shrink-0">
                             <i class="fa-solid fa-bell text-gray-600 text-lg"></i>
-                            <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white">
-                            2
-                        </span>
+                            <span th:if="${unreadCount != null and unreadCount > 0}"
+                                  th:text="${unreadCount}"
+                                  class="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white">
+                                2
+                            </span>
                         </button>
                     </div>
 

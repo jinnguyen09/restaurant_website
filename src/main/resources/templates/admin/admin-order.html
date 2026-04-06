@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị - PHỞ HẨM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/css/admin.css" rel="stylesheet">
+    <style>
+        /* Chỉ áp dụng cho các thành phần bên trong main */
+        main .order-card {
+            background: #ffffff;
+            border-radius: 16px; /* Bo góc lớn hiện đại */
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Hiệu ứng nhấc nhẹ thẻ khi hover */
+        main .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Badge trạng thái */
+        main .badge-status {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Định dạng text */
+        main .order-id { color: #2d3748; font-weight: 700; }
+        main .customer-info-title, main .order-detail-title {
+            color: #4a5568;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            margin-bottom: 15px;
+        }
+
+        main .price-total {
+            color: #e53e3e;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        /* --- Nút bấm và hiệu ứng hover nâng cao --- */
+        main .btn-action {
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); /* Chuyển động mượt mà */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Nút bấm lún xuống khi click */
+        main .btn-action:active {
+            transform: scale(0.95);
+        }
+
+        /* 1. Nút Xác nhận (Xanh lá) */
+        main .btn-confirm {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        main .btn-confirm:hover {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        /* 2. Nút Từ chối (Đỏ/Trắng) */
+        main .btn-reject {
+            background-color: #ffffff;
+            color: #ef4444;
+            border: 2px solid #fee2e2;
+        }
+
+        main .btn-reject:hover {
+            background-color: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* 3. Nút Shipper (Tím) */
+        main .btn-shipper {
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+        }
+
+        main .btn-shipper:hover {
+            background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
+            color: white;
+        }
+
+        /* 4. Nút Chi tiết (Xám/Icon) */
+        main .btn-detail {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+
+        main .btn-detail:hover {
+            background-color: #374151;
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hiệu ứng lướt sáng (Shine effect) khi hover vào các nút chính */
+        main .btn-confirm::after, main .btn-shipper::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        main .btn-confirm:hover::after, main .btn-shipper:hover::after {
+            left: 100%;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='order')}"></div>
+<main class="container my-4">
+    <div class="bg-white p-3 rounded-4 shadow-sm mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="fa-solid fa-magnifying-glass"></i></span>
+                    <input type="text" class="form-control bg-light border-0" placeholder="Tìm kiếm theo mã đơn, tên, SĐT...">
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="d-flex gap-2 overflow-auto no-scrollbar">
+                    <button class="btn btn-danger btn-sm px-3 rounded-pill">Tất cả</button>
+                    <button class="btn btn-outline-secondary btn-sm px-3 rounded-pill">Chờ xác nhận</button>
+                    <button class="btn btn-outline-secondary btn-sm px-3 rounded-pill">Đang chuẩn bị</button>
+                    <button class="btn btn-outline-secondary btn-sm px-3 rounded-pill">Hoàn thành</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-card">
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-box text-danger"></i>
+                    <h5 class="fw-bold m-0 order-id">ORD-001</h5>
+                </div>
+                <small class="text-muted"><i class="fa-solid fa-clock me-1"></i> 10 phút trước</small>
+            </div>
+            <span class="badge bg-warning text-dark badge-status">Chờ xác nhận</span>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6 border-end">
+                <h6 class="customer-info-title">Thông tin khách hàng</h6>
+                <p class="mb-1"><strong>Tên:</strong> Nguyễn Văn A</p>
+                <p class="mb-1"><strong>SĐT:</strong> 0123456789</p>
+                <p class="mb-0 text-muted"><strong>Địa chỉ:</strong> 123 Nguyễn Huệ, Q1, HCM</p>
+            </div>
+            <div class="col-md-6 ps-md-4">
+                <h6 class="order-detail-title">Chi tiết đơn hàng</h6>
+                <ul class="list-unstyled mb-3">
+                    <li>• Phở Bò Tái <span class="text-muted">x2</span></li>
+                    <li>• Cà Phê Sữa Đá <span class="text-muted">x1</span></li>
+                </ul>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-secondary">Tổng cộng:</span>
+                    <span class="price-total">155.000đ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2">
+            <div class="col-md-8">
+                <button class="btn btn-confirm btn-action w-100">
+                    <i class="fa-solid fa-circle-check"></i> Xác nhận đơn
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-reject btn-action w-100">
+                    <i class="fa-solid fa-circle-xmark"></i> Từ chối
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-detail btn-action w-100"><i class="fa-solid fa-eye"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-card">
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-box text-danger"></i>
+                    <h5 class="fw-bold m-0 order-id">ORD-002</h5>
+                </div>
+                <small class="text-muted"><i class="fa-solid fa-clock me-1"></i> 25 phút trước</small>
+            </div>
+            <span class="badge bg-primary badge-status">Đang chuẩn bị</span>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6 border-end">
+                <h6 class="customer-info-title">Thông tin khách hàng</h6>
+                <p class="mb-1"><strong>Tên:</strong> Nguyễn Văn A</p>
+                <p class="mb-1"><strong>SĐT:</strong> 0123456789</p>
+                <p class="mb-0 text-muted"><strong>Địa chỉ:</strong> 123 Nguyễn Huệ, Q1, HCM</p>
+            </div>
+            <div class="col-md-6 ps-md-4">
+                <h6 class="order-detail-title">Chi tiết đơn hàng</h6>
+                <ul class="list-unstyled mb-3">
+                    <li>• Phở Bò Tái <span class="text-muted">x2</span></li>
+                    <li>• Cà Phê Sữa Đá <span class="text-muted">x1</span></li>
+                </ul>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-secondary">Tổng cộng:</span>
+                    <span class="price-total">155.000đ</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-2">
+            <div class="col-md-11">
+                <button class="btn btn-shipper btn-action w-100">
+                    <i class="fa-solid fa-truck-fast"></i> Giao cho shipper
+                </button>
+            </div>
+            <div class="col-md-1">
+                <button class="btn btn-detail btn-action w-100"><i class="fa-solid fa-eye"></i></button>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

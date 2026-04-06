@@ -1,24 +1,28 @@
-<footer th:fragment="footer_section" class="bg-[#020617] text-gray-300 pt-16 pb-8 px-6 md:px-20 border-t border-gray-800">  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+<footer th:fragment="footer_section" class="bg-[#020617] text-gray-300 pt-16 pb-8 px-6 md:px-20 border-t border-gray-800">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
     <div class="space-y-4">
       <div class="flex items-center gap-2">
         <div class="bg-yellow-500 p-2 rounded">
-          <span class="text-white font-bold">PHỞ HẦM</span>
+          <span class="text-white font-bold">HUONG VIET</span>
         </div>
         <div class="hidden md:block">
-          <h1 class="text-red-700 font-bold leading-none">PHỞ HẦM</h1>
-          <p class="text-[10px] text-gray-500">Real Vietnamese Noodles</p>
+          <h1 class="text-red-700 font-bold leading-none">HƯƠNG VIỆT</h1>
+          <p class="text-[10px] text-gray-500 uppercase tracking-tighter">Real Vietnamese Restaurants</p>
         </div>
       </div>
-      <p class="text-sm leading-relaxed text-gray-400">Hương vị truyền thống Việt Nam, phục vụ tận tâm từ 2015.</p>
+      <p class="text-sm leading-relaxed text-gray-400 italic"
+         th:text="${currentBranch != null ? currentBranch.slogan : 'Hương vị truyền thống Việt Nam - Phục vụ tận tâm.'}">
+        Hương vị truyền thống Việt Nam...
+      </p>
     </div>
 
     <div>
       <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Liên kết</h4>
-      <ul class="space-y-3 text-sm">
-        <li><a href="#" class="hover:text-white transition-soft">Giới thiệu</a></li>
-        <li><a href="#" class="hover:text-white transition-soft">Thực đơn</a></li>
-        <li><a href="#" class="hover:text-white transition-soft">Đặt bàn</a></li>
-        <li><a href="#" class="hover:text-white transition-soft">Tin tức</a></li>
+      <ul class="space-y-3 text-sm font-medium">
+        <li><a th:href="@{/home}" class="hover:text-red-500 transition-all duration-300">Trang chủ</a></li>
+        <li><a th:href="@{/menu}" class="hover:text-red-500 transition-all duration-300">Thực đơn</a></li>
+        <li><a th:href="@{/reservation}" class="hover:text-red-500 transition-all duration-300">Đặt bàn</a></li>
+        <li><a th:href="@{/contact}" class="hover:text-red-500 transition-all duration-300">Liên hệ</a></li>
       </ul>
     </div>
 
@@ -26,43 +30,47 @@
       <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Giờ mở cửa</h4>
       <div class="space-y-3 text-sm">
         <div class="flex flex-col">
-          <span class="text-gray">Thứ 4 - Thứ 2</span>
-          <span class="text-white">12:00 - 22:00</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="text-gray">Thứ 7 - Chủ nhật</span>
-          <span class="text-white">12:00 - 23:00</span>
+          <span class="text-gray-500">Hằng ngày - Trừ thứ 3</span>
+          <span class="text-white font-bold"
+                th:if="${currentBranch != null}"
+                th:text="${#temporals.format(currentBranch.openingTime, 'HH:mm')} + ' - ' + ${#temporals.format(currentBranch.closingTime, 'HH:mm')}">
+            07:00 - 22:00
+          </span>
+          <span class="text-white font-bold" th:unless="${currentBranch != null}">07:00 - 22:00</span>
         </div>
       </div>
     </div>
 
     <div>
-      <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Liên hệ</h4>
+      <h4 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Liên hệ chi nhánh</h4>
       <ul class="space-y-4 text-sm text-gray-400">
-        <li class="flex items-start gap-3">
-          <i class="fa-solid fa-location-dot mt-1 text-gray-500"></i>
-          <span>32 Hope St, Liverpool L1 9BX, United Kingdom</span>
+        <li class="flex items-start gap-3 group">
+          <i class="fa-solid fa-location-dot mt-1 text-red-600 group-hover:scale-110 transition-transform"></i>
+          <span th:text="${currentBranch != null ? currentBranch.address : 'Vinh, Nghệ An'}">Địa chỉ</span>
         </li>
-        <li class="flex items-center gap-3">
-          <i class="fa-solid fa-phone text-gray-500"></i>
-          <span>+44 151 708 0355</span>
+        <li class="flex items-center gap-3 group">
+          <i class="fa-solid fa-phone text-red-600 group-hover:scale-110 transition-transform"></i>
+          <span th:text="${currentBranch != null ? currentBranch.phone : '0238 123 4567'}">Số điện thoại</span>
         </li>
-        <li class="flex items-center gap-3">
-          <i class="fa-solid fa-envelope text-gray-500"></i>
-          <span>huongvietliverpool@gmail.com</span>
+        <li class="flex items-center gap-3 group">
+          <i class="fa-solid fa-envelope text-red-600 group-hover:scale-110 transition-transform"></i>
+          <span th:text="${currentBranch != null ? currentBranch.email : 'contact@huongviet.vn'}">Email</span>
         </li>
       </ul>
     </div>
   </div>
 
   <div class="max-w-7xl mx-auto pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-6">
-    <p class="text-xs text-gray-500">© 2026 PHỞ HẦM. All rights reserved.</p>
+    <p class="text-xs text-gray-500">© 2026 <span class="text-red-700 font-bold">HƯƠNG VIỆT</span>. All rights reserved.</p>
     <div class="flex gap-4">
-      <a href="#" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 transition-soft text-white">
-        <i class="fa-brands fa-facebook-f text-sm"></i>
+      <a href="#" class="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center hover:bg-blue-600 hover:-translate-y-1 transition-all duration-300 text-white shadow-lg">
+        <i class="fa-brands fa-facebook-f"></i>
       </a>
-      <a href="#" class="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-600 transition-soft text-white">
-        <i class="fa-brands fa-instagram text-sm"></i>
+      <a href="#" class="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center hover:bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-600 hover:-translate-y-1 transition-all duration-300 text-white shadow-lg">
+        <i class="fa-brands fa-instagram"></i>
+      </a>
+      <a href="#" class="w-10 h-10 rounded-xl bg-gray-900 flex items-center justify-center hover:bg-red-600 hover:-translate-y-1 transition-all duration-300 text-white shadow-lg">
+        <i class="fa-brands fa-youtube"></i>
       </a>
     </div>
   </div>

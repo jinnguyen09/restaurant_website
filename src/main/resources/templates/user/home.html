@@ -15,67 +15,31 @@
     <div th:replace="~{layout/user/navbar :: header}"></div>
 
     <main class="main">
-        <section class="hero-bg h-[550px] flex flex-col items-center justify-center text-center text-white px-4 relative overflow-hidden">
+        <section th:style="'background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(' + (${restaurant.restaurantImg != null ? restaurant.restaurantImg : '/img/hero-default.jpg'}) + '); background-size: cover; background-position: center;'"
+                 class="h-[550px] flex flex-col items-center justify-center text-center text-white px-4 relative overflow-hidden">
             <div class="animate-fadeInUp flex flex-col items-center">
-                
-                <span class="text-yellow-500 font-bold tracking-[0.3em] mb-4 text-sm opacity-0 animate-slideDown">
+                <span class="text-yellow-500 font-bold tracking-[0.3em] mb-4 text-sm opacity-0 animate-slideDown"
+                      th:text="${restaurant.slogan != null ? restaurant.slogan : 'TRUYỀN THỐNG & TẬN TÂM'}">
                     TRUYỀN THỐNG & TẬN TÂM
                 </span>
 
-                <h2 class="text-5xl md:text-7xl font-black mb-6 drop-shadow-2xl tracking-tight opacity-0 animate-zoomIn">
+                <h2 class="text-5xl md:text-7xl font-black mb-6 drop-shadow-2xl tracking-tight opacity-0 animate-zoomIn"
+                    th:text="${restaurant.name}">
                     PHỞ HẦM
                 </h2>
 
-                <p class="text-lg max-w-xl font-light opacity-0 mb-10 leading-relaxed animate-fadeIn delay-500">
-                    Nơi gìn giữ tinh túy nước dùng từ xương ống hầm 24h, mang đến hương vị Phở Việt nguyên bản.
+                <p class="text-lg max-w-xl font-light opacity-0 mb-10 leading-relaxed animate-fadeIn delay-500"
+                   th:text="${restaurant.description != null ? restaurant.description : 'Nơi gìn giữ tinh túy nước dùng từ xương ống hầm 24h, mang đến hương vị Phở Việt nguyên bản.'}">
+                    Nơi gìn giữ tinh túy nước dùng...
                 </p>
 
                 <div class="flex gap-4 opacity-0 animate-fadeInUp delay-700">
-                    <button class="relative bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-full font-bold shadow-xl transition-all duration-300 transform hover:scale-105 hover:shadow-red-500/50 active:scale-95 group overflow-hidden">
-                        <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></span>
+                    <a th:href="@{/menu}" class="relative bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-full font-bold shadow-xl transition-all duration-300 transform hover:scale-105 group overflow-hidden">
                         <span class="relative">KHÁM PHÁ THỰC ĐƠN</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-24 px-6 max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                
-                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(251,146,60,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-0 bg-orange-500 group-hover:h-full transition-all duration-500"></div>
-                    <div class="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-orange-500 group-hover:to-orange-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">
-                        <i class="fa-solid fa-leaf text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-orange-700 transition-colors">Tươi sạch</h3>
-                    <p class="text-[15px] text-gray-500 leading-relaxed">Nguyên liệu được đảm bảo <span class="text-orange-600 font-semibold">kiểm tra kĩ lưỡng</span> mỗi ngày.</p>
-                </div>
-
-                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(96,165,250,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-0 bg-blue-500 group-hover:h-full transition-all duration-500"></div>
-                    <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-blue-500 group-hover:to-blue-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">
-                        <i class="fa-solid fa-bolt text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-blue-700 transition-colors">Nhanh chóng</h3>
-                    <p class="text-[15px] text-gray-500 leading-relaxed">Phục vụ và ra món tối đa trong <span class="text-blue-600 font-semibold">10 phút</span> tại bàn.</p>
-                </div>
-
-                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(239,68,68,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-0 bg-red-500 group-hover:h-full transition-all duration-500"></div>
-                    <div class="w-16 h-16 bg-gradient-to-br from-red-50 to-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-red-500 group-hover:to-red-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">
-                        <i class="fa-solid fa-fire-burner text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-red-700 transition-colors">Gia truyền</h3>
-                    <p class="text-[15px] text-gray-500 leading-relaxed">Công thức nước dùng độc quyền của <span class="text-red-600 font-semibold">Pho Ham</span>.</p>
-                </div>
-
-                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(34,197,94,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-0 bg-green-500 group-hover:h-full transition-all duration-500"></div>
-                    <div class="w-16 h-16 bg-gradient-to-br from-green-50 to-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-green-500 group-hover:to-green-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">
-                        <i class="fa-solid fa-headset text-2xl"></i>
-                    </div>
-                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-green-700 transition-colors">Tận tâm</h3>
-                    <p class="text-[15px] text-gray-500 leading-relaxed">Luôn <span class="text-green-600 font-semibold">lắng nghe</span> mọi góp ý từ khách hàng.</p>
+                    </a>
+                    <a th:href="@{/reservation}" class="bg-white text-red-600 px-10 py-4 rounded-full font-bold shadow-xl hover:bg-gray-100 transition-all transform hover:scale-105">
+                        ĐẶT BÀN NGAY
+                    </a>
                 </div>
             </div>
         </section>
@@ -115,3 +79,44 @@
     <script src="/js/main.js"></script>
 </body>
 </html>
+
+<!--        <section class="py-24 px-6 max-w-7xl mx-auto">-->
+<!--            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">-->
+<!--                -->
+<!--                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(251,146,60,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">-->
+<!--                    <div class="absolute top-0 left-0 w-2 h-0 bg-orange-500 group-hover:h-full transition-all duration-500"></div>-->
+<!--                    <div class="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 text-orange-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-orange-500 group-hover:to-orange-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">-->
+<!--                        <i class="fa-solid fa-leaf text-2xl"></i>-->
+<!--                    </div>-->
+<!--                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-orange-700 transition-colors">Tươi sạch</h3>-->
+<!--                    <p class="text-[15px] text-gray-500 leading-relaxed">Nguyên liệu được đảm bảo <span class="text-orange-600 font-semibold">kiểm tra kĩ lưỡng</span> mỗi ngày.</p>-->
+<!--                </div>-->
+
+<!--                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(96,165,250,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">-->
+<!--                    <div class="absolute top-0 left-0 w-2 h-0 bg-blue-500 group-hover:h-full transition-all duration-500"></div>-->
+<!--                    <div class="w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-blue-500 group-hover:to-blue-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">-->
+<!--                        <i class="fa-solid fa-bolt text-2xl"></i>-->
+<!--                    </div>-->
+<!--                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-blue-700 transition-colors">Nhanh chóng</h3>-->
+<!--                    <p class="text-[15px] text-gray-500 leading-relaxed">Phục vụ và ra món tối đa trong <span class="text-blue-600 font-semibold">10 phút</span> tại bàn.</p>-->
+<!--                </div>-->
+
+<!--                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(239,68,68,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">-->
+<!--                    <div class="absolute top-0 left-0 w-2 h-0 bg-red-500 group-hover:h-full transition-all duration-500"></div>-->
+<!--                    <div class="w-16 h-16 bg-gradient-to-br from-red-50 to-red-100 text-red-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-red-500 group-hover:to-red-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">-->
+<!--                        <i class="fa-solid fa-fire-burner text-2xl"></i>-->
+<!--                    </div>-->
+<!--                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-red-700 transition-colors">Gia truyền</h3>-->
+<!--                    <p class="text-[15px] text-gray-500 leading-relaxed">Công thức nước dùng độc quyền của <span class="text-red-600 font-semibold">Pho Ham</span>.</p>-->
+<!--                </div>-->
+
+<!--                <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-[0_20px_50px_rgba(34,197,94,0.15)] hover:-translate-y-3 transition-all duration-500 cursor-default relative overflow-hidden">-->
+<!--                    <div class="absolute top-0 left-0 w-2 h-0 bg-green-500 group-hover:h-full transition-all duration-500"></div>-->
+<!--                    <div class="w-16 h-16 bg-gradient-to-br from-green-50 to-green-100 text-green-600 rounded-2xl flex items-center justify-center mb-8 group-hover:from-green-500 group-hover:to-green-600 group-hover:text-white group-hover:rotate-[360deg] transition-all duration-700 shadow-sm">-->
+<!--                        <i class="fa-solid fa-headset text-2xl"></i>-->
+<!--                    </div>-->
+<!--                    <h3 class="font-bold text-xl mb-3 text-gray-800 group-hover:text-green-700 transition-colors">Tận tâm</h3>-->
+<!--                    <p class="text-[15px] text-gray-500 leading-relaxed">Luôn <span class="text-green-600 font-semibold">lắng nghe</span> mọi góp ý từ khách hàng.</p>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </section>-->

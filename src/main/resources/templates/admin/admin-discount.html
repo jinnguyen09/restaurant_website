@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị - PHỞ HẨM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/css/admin.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .discount-card { border: none; border-radius: 20px; transition: 0.3s; border-left: 6px solid #ff4757; height: 100%; position: relative; }
+        .discount-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
+        .badge-active { background-color: #e3fcef; color: #00875a; border-radius: 50px; padding: 5px 12px; }
+        .badge-inactive { background-color: #ffebe6; color: #de350b; border-radius: 50px; padding: 5px 12px; }
+        .discount-val { font-size: 2rem; font-weight: 800; color: #ff4757; line-height: 1; }
+        .modal-content { border-radius: 25px; border: none; }
+        .dropdown-menu { border-radius: 12px; overflow: hidden; }
+    </style>
+</head>
+<body class="bg-light">
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='discount')}"></div>
+
+<div class="container py-5">
+
+    <div class="d-flex align-items-center p-3 bg-white shadow-sm rounded-4 border-start border-danger border-4 mb-4">
+        <div class="bg-danger-subtle p-2 rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+            <i class="fa-solid fa-shop text-danger fs-5"></i>
+        </div>
+        <div class="flex-grow-1">
+            <p class="text-muted small mb-0">Hệ thống đang quản lý chương trình khuyến mãi tại:</p>
+            <h4 th:class="${currentBranch == null ? 'fw-bold mb-0 text-danger' : 'fw-bold mb-0 text-dark'}"
+                th:text="${currentBranch != null ? currentBranch.name : 'VUI LÒNG CHỌN CHI NHÁNH!'}">
+            </h4>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h2 class="fw-bold mb-1">Chiến dịch Khuyến mãi</h2>
+            <p class="text-muted mb-0">Quản lý các chương trình giảm giá tại chi nhánh</p>
+        </div>
+        <button class="btn btn-danger rounded-4 px-4 py-2 fw-bold shadow-sm" onclick="prepareAddModal()">
+            <i class="fa-solid fa-plus me-2"></i>Tạo chiến dịch
+        </button>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 15px;">
+        <i class="fa-solid fa-circle-check me-2"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 15px;">
+        <i class="fa-solid fa-circle-exclamation me-2"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4" th:each="d : ${discounts}">
+            <div class="card discount-card shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span th:class="${d.status == 1 ? 'badge-active' : 'badge-inactive'}" class="small fw-bold">
+                            <i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i>
+                            <span th:text="${d.status == 1 ? 'Đang chạy' : 'Tạm dừng'}"></span>
+                        </span>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                            <ul class="dropdown-menu border-0 shadow">
+                                <li>
+                                    <a class="dropdown-item" href="javascript:void(0)"
+                                       th:data-id="${d.discountId}"
+                                       th:data-name="${d.discountName}"
+                                       th:data-type="${d.discountType}"
+                                       th:data-value="${d.discountValue}"
+                                       th:data-start="${d.startDate}"
+                                       th:data-end="${d.endDate}"
+                                       th:data-status="${d.status}"
+                                       onclick="prepareEditModal(this)">
+                                        <i class="fa-solid fa-pen me-2 text-primary"></i>Sửa thông tin
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="javascript:void(0)"
+                                       th:data-id="${d.discountId}"
+                                       th:data-name="${d.discountName}"
+                                       onclick="confirmDelete(this)">
+                                        <i class="fa-solid fa-trash me-2"></i>Xóa chiến dịch
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-2" th:text="${d.discountName}">Tên chương trình</h5>
+                    <div class="discount-val mb-3">
+                        <span th:if="${d.discountType == 'PERCENTAGE'}" th:text="${d.discountValue + '%'}"></span>
+                        <span th:if="${d.discountType == 'FIXED_AMOUNT'}"
+                              th:text="${#numbers.formatInteger(d.discountValue, 0, 'POINT') + 'đ'}"></span>
+                    </div>
+
+                    <div class="small text-muted mb-4">
+                        <i class="fa-regular fa-calendar me-1"></i>
+                        <span th:text="${#temporals.format(d.startDate, 'dd/MM/yyyy')}"></span> -
+                        <span th:text="${#temporals.format(d.endDate, 'dd/MM/yyyy')}"></span>
+                    </div>
+
+                    <a th:href="@{/admin/discount/apply/{id}(id=${d.discountId})}"
+                       class="btn btn-outline-danger w-100 rounded-3 fw-bold btn-sm py-2">
+                        <i class="fa-solid fa-utensils me-2"></i>Áp dụng cho món ăn
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(discounts)}">
+            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="100" class="opacity-25 mb-3">
+            <p class="text-muted">Chưa có chương trình khuyến mãi nào.</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="discountModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form th:action="@{/admin/discount/save}" method="post" id="discountForm" class="modal-content shadow-lg p-3">
+            <input type="hidden" name="discountId" id="modalId">
+
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="modalTitle">Thiết lập khuyến mãi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Tên chiến dịch</label>
+                    <input type="text" name="discountName" id="modalName" class="form-control py-2" required>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Loại hình</label>
+                        <select name="discountType" id="modalType" class="form-select py-2">
+                            <option value="PERCENTAGE">Phần trăm (%)</option>
+                            <option value="FIXED_AMOUNT">Số tiền cố định (đ)</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Giá trị giảm</label>
+                        <input type="number" name="discountValue" id="modalValue" class="form-control py-2" required>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Ngày bắt đầu</label>
+                        <input type="datetime-local" name="startDate" id="modalStart" class="form-control py-2" required>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small fw-bold text-muted">Ngày kết thúc</label>
+                        <input type="datetime-local" name="endDate" id="modalEnd" class="form-control py-2" required>
+                    </div>
+                </div>
+                <div class="mb-4" id="statusGroup" style="display: none;">
+                    <label class="form-label small fw-bold text-muted">Trạng thái</label>
+                    <select name="status" id="modalStatus" class="form-select py-2">
+                        <option value="1">Đang chạy</option>
+                        <option value="0">Tạm dừng</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-danger w-100 py-2 fw-bold rounded-3 shadow-sm">Lưu thông tin</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const bsModal = new bootstrap.Modal(document.getElementById('discountModal'));
+
+    function prepareAddModal() {
+        document.getElementById('modalTitle').innerText = "Tạo chiến dịch mới";
+        document.getElementById('discountForm').reset();
+        document.getElementById('modalId').value = "";
+        document.getElementById('statusGroup').style.display = "none";
+        bsModal.show();
+    }
+
+    function prepareEditModal(btn) {
+        document.getElementById('modalTitle').innerText = "Chỉnh sửa chiến dịch";
+
+        const id = btn.getAttribute('data-id');
+        const name = btn.getAttribute('data-name');
+        const type = btn.getAttribute('data-type');
+        const value = btn.getAttribute('data-value');
+        const start = btn.getAttribute('data-start');
+        const end = btn.getAttribute('data-end');
+        const status = btn.getAttribute('data-status');
+
+        document.getElementById('modalId').value = id;
+        document.getElementById('modalName').value = name;
+        document.getElementById('modalType').value = type;
+        document.getElementById('modalValue').value = value;
+        document.getElementById('modalStatus').value = status;
+        document.getElementById('statusGroup').style.display = "block";
+
+        if (start) document.getElementById('modalStart').value = start.substring(0, 16);
+        if (end) document.getElementById('modalEnd').value = end.substring(0, 16);
+
+        bsModal.show();
+    }
+
+    document.getElementById('discountForm').addEventListener('submit', function(e) {
+        const start = new Date(document.getElementById('modalStart').value);
+        const end = new Date(document.getElementById('modalEnd').value);
+
+        if (end <= start) {
+            e.preventDefault();
+            Swal.fire('Lỗi!', 'Ngày kết thúc phải sau ngày bắt đầu', 'error');
+        }
+    });
+
+    function confirmDelete(element) {
+        const discountId = element.getAttribute('data-id');
+        const discountName = element.getAttribute('data-name');
+
+        Swal.fire({
+            title: 'Xác nhận xóa?',
+            text: `Bạn có chắc chắn muốn xóa chiến dịch "${discountName}"? Hành động này không thể hoàn tác!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ff4757',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Vẫn xóa',
+            cancelButtonText: 'Hủy bỏ',
+            border: 'none',
+            borderRadius: '20px'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/admin/discount/delete/${discountId}`;
+            }
+        });
+    }
+
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 3000);
+</script>
+</body>
+</html>

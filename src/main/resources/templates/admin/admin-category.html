@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Danh Mục - PHỞ HẨM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="/css/admin.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .modal-content { border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .modal-header { border-bottom: 1px solid #f0f0f0; background-color: #f8f9fa; border-radius: 15px 15px 0 0; }
+    .form-label { font-weight: 600; color: #444; }
+    .btn-edit { color: #ffc107; border-color: #ffc107; }
+    .btn-edit:hover { background-color: #ffc107; color: #fff; }
+  </style>
+</head>
+<body>
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='category')}"></div>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3><i class="fas fa-list-ul"></i> Quản Lý Danh Mục</h3>
+    <button class="btn btn-primary" onclick="showAddModal()">
+      <i class="fas fa-plus"></i> Thêm danh mục mới
+    </button>
+  </div>
+
+  <div class="container mt-3">
+    <div th:if="${param.error != null and param.error[0] == 'is_parent'}"
+         class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      <strong>Lỗi:</strong> Không thể xóa hoặc sửa Danh mục cha (Danh mục gốc).
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${param.error != null and param.error[0] == 'has_children'}"
+         class="alert alert-warning alert-dismissible fade show" role="alert">
+      <i class="fas fa-layer-group me-2"></i>
+      <strong>Lỗi:</strong> Danh mục này đang chứa các mục con hoặc sản phẩm, vui lòng xóa chúng trước.
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle me-2"></i>
+      Thực hiện thao tác thành công!
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-hover">
+        <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Tên danh mục</th>
+          <th>Mô tả</th>
+          <th>Trang</th>
+          <th class="text-end">Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cat : ${categories}" th:if="${cat.categoryId != 1 and cat.categoryId != 2}">
+          <td th:text="${cat.categoryId}" class="fw-bold text-muted"></td>
+          <td>
+            <div class="d-flex flex-column">
+              <span th:text="${cat.categoryName}" class="fw-bold"></span>
+              <small th:if="${cat.parent != null}" class="text-primary">
+                <i class="fas fa-level-up-alt fa-rotate-90 me-1"></i>
+                <span th:text="${cat.parent.categoryName}"></span>
+              </small>
+            </div>
+          </td>
+          <td th:text="${cat.description}" class="text-truncate" style="max-width: 200px;"></td>
+          <td>
+            <span class="badge bg-light text-dark border" th:text="${cat.parent != null ? 'Trang ' + cat.parent.categoryName : 'Gốc'}"></span>
+          </td>
+          <td class="text-end">
+            <button type="button" class="btn btn-sm btn-edit me-1"
+                    th:onclick="|editCategory(${cat.categoryId})|">
+              <i class="fas fa-edit"></i> Sửa
+            </button>
+
+            <button type="button" class="btn btn-sm btn-outline-danger"
+                    th:onclick="|confirmDelete(${cat.categoryId})|">
+              <i class="fas fa-trash"></i> Xóa
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="categoryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="categoryForm" th:action="@{/admin/category/save}" method="post" th:object="${category}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Thêm Danh Mục</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="categoryId" th:field="*{categoryId}">
+
+          <div class="mb-3">
+            <label class="form-label">Tên danh mục</label>
+            <input type="text" id="categoryName" th:field="*{categoryName}" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Mô tả</label>
+            <textarea id="description" th:field="*{description}" class="form-control" rows="2"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Thuộc trang</label>
+            <select id="parent" name="parent" class="form-select" required>
+              <option value="" disabled selected>-- Chọn trang hiển thị --</option>
+              <option th:each="p : ${parentCategories}"
+                      th:value="${p.categoryId}"
+                      th:text="${p.categoryName}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  let categoryModal;
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const modalElement = document.getElementById('categoryModal');
+    if (modalElement) {
+      categoryModal = new bootstrap.Modal(modalElement);
+    }
+  });
+
+  function showAddModal() {
+    document.getElementById('modalTitle').innerText = "Thêm Danh Mục Mới";
+    document.getElementById('categoryForm').reset();
+    document.getElementById('categoryId').value = "";
+    document.getElementById('parent').value = "";
+    if (categoryModal) categoryModal.show();
+  }
+
+  function editCategory(id) {
+    fetch('/admin/category/edit/' + id)
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok');
+              return response.json();
+            })
+            .then(data => {
+              console.log("Dữ liệu nhận được:", data);
+
+              document.getElementById('modalTitle').innerText = "Chỉnh sửa: " + (data.categoryName || "");
+              document.getElementById('categoryId').value = data.categoryId || "";
+              document.getElementById('categoryName').value = data.categoryName || "";
+              document.getElementById('description').value = data.description || "";
+
+              const parentSelect = document.getElementById('parent');
+              if (parentSelect) {
+                parentSelect.value = data.parentId || (data.parent ? data.parent.categoryId : "");
+              }
+
+              if (categoryModal) {
+                categoryModal.show();
+              } else {
+                console.error("Modal chưa được khởi tạo!");
+              }
+            })
+            .catch(error => {
+              console.error("Lỗi Fetch:", error);
+              Swal.fire('Lỗi!', 'Không thể lấy dữ liệu: ' + error.message, 'error');
+            });
+  }
+
+  function confirmDelete(id) {
+    Swal.fire({
+      title: 'Xác nhận xóa?',
+      text: "Dữ liệu đã xóa không thể khôi phục lại!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Xác nhận!',
+      cancelButtonText: 'Hủy'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/admin/category/delete/' + id;
+      }
+    })
+  }
+</script>
+</body>
+</html>

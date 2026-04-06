@@ -38,6 +38,7 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+	implementation("net.coobird:thumbnailator:0.4.20")
 }
 
 tasks.withType<Test> {

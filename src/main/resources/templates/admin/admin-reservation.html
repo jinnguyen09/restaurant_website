@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị - PHỞ HẨM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/css/admin.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Header Search Bar */
+        .search-bar-container {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .btn-filter-active { background-color: #c62828; color: white; border: none; }
+        .btn-filter { background: white; border: 1px solid #dee2e6; color: #333; }
+
+        /* Reservation Card */
+        .rsv-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .badge-pending { background-color: #ffc107; color: white; }
+        .badge-confirmed { background-color: #4caf50; color: white; }
+
+        /* Detail Boxes */
+        .detail-item {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .detail-icon {
+            color: #d32f2f;
+            font-size: 1.2rem;
+        }
+        .detail-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: 2px;
+        }
+        .detail-value {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        /* Action Buttons */
+        .btn-confirm {
+            background-color: #00a844;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .btn-reject {
+            background-color: white;
+            color: #d32f2f;
+            border: 1px solid #d32f2f;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .btn-confirm:hover { background-color: #008f3a; color: white; }
+        .btn-reject:hover { background-color: #d32f2f; color: white; }
+    </style>
+</head>
+<body>
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='reservation')}"></div>
+<main class="container py-4">
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i> <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+        <i class="fa-solid fa-circle-exclamation me-2"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="search-bar-container d-flex gap-3 align-items-center mb-4">
+        <form th:action="@{/admin/reservation}" method="get" class="input-group flex-grow-1">
+            <span class="input-group-text bg-light border-0"><i class="fa fa-search text-muted"></i></span>
+            <input type="text" name="keyword" th:value="${keyword}" class="form-control bg-light border-0" placeholder="Tìm kiếm tên khách, SĐT...">
+            <button type="submit" class="btn btn-dark px-4 rounded-end-2">Lọc</button>
+        </form>
+        <div class="d-flex gap-2">
+            <button class="btn btn-filter-active px-4 shadow-sm">Tất cả</button>
+            <button class="btn btn-filter px-4 shadow-sm">Hôm nay</button>
+        </div>
+        <button class="btn btn-danger rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#createReservationModal">
+            <i class="fa-solid fa-plus me-2"></i>Thêm đặt bàn mới
+        </button>
+    </div>
+
+    <div class="d-flex flex-column gap-4">
+
+        <div th:each="res : ${reservations}" class="rsv-card shadow-sm border border-white">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h4 class="fw-bold mb-0" th:text="'RSV-' + ${res.reservationId}">RSV-ID</h4>
+                    <small class="text-muted">Đã gửi yêu cầu</small>
+                </div>
+                <span th:class="'status-badge ' +
+                      (${res.status == 'PENDING'} ? 'badge-pending' :
+                      (${res.status == 'CONFIRMED'} ? 'badge-confirmed' :
+                      (${res.status == 'REJECTED'} ? 'badge-rejected' : 'badge-completed')))"
+                      th:text="${res.status == 'PENDING' ? 'Chờ xác nhận' :
+                               (res.statu == 'CONFIRMED' ? 'Đã xác nhận' :
+                               (res.status == 'REJECTED' ? 'Đã từ chối' : 'Hoàn thành'))}">
+                </span>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-tag me-2 text-danger"></i>Thông tin khách hàng</h6>
+                    <p class="mb-2 text-muted">Tên: <span class="text-dark fw-bold" th:text="${res.user != null ? res.user.fullName : 'Ẩn danh'}">Tên</span></p>
+                    <p class="mb-2 text-muted">SĐT: <span class="text-dark fw-medium" th:text="${res.user != null ? res.user.phone : 'N/A'}">SĐT</span></p>
+                    <p class="mb-0 text-muted">Ghi chú: <span class="text-dark italic" th:text="${res.description != null && !res.description.isEmpty() ? res.description : 'Không có'}">Ghi chú</span></p>
+                </div>
+                <div class="col-md-6 border-start">
+                    <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-circle-info me-2 text-danger"></i>Chi tiết đặt bàn</h6>
+                    <div class="row g-2">
+                        <div class="col-sm-4">
+                            <div class="detail-item mb-0 h-100">
+                                <div>
+                                    <div class="detail-label"><i class="fa-regular fa-calendar me-1"></i>Ngày</div>
+                                    <div class="detail-value" th:text="${#temporals.format(res.reservationTime, 'dd/MM/yyyy')}">10/2/2026</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="detail-item mb-0 h-100">
+                                <div>
+                                    <div class="detail-label"><i class="fa-regular fa-clock me-1"></i>Giờ</div>
+                                    <div class="detail-value" th:text="${#temporals.format(res.reservationTime, 'HH:mm')}">18:00</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="detail-item mb-0 h-100">
+                                <div>
+                                    <div class="detail-label"><i class="fa-solid fa-users me-1"></i>Số khách</div>
+                                    <div class="detail-value" th:text="${res.numberOfPeople} + ' người'">4</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3" th:if="${res.status == 'PENDING'}">
+                <div class="col-6">
+                    <form th:action="@{/admin/reservation/update-status}" method="post">
+                        <input type="hidden" name="id" th:value="${res.reservationId}">
+                        <input type="hidden" name="status" value="CONFIRMED">
+                        <button type="submit" class="btn btn-confirm w-100 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-regular fa-circle-check"></i> Xác nhận đơn này
+                        </button>
+                    </form>
+                </div>
+                <div class="col-6">
+                    <form th:action="@{/admin/reservation/update-status}" method="post">
+                        <input type="hidden" name="id" th:value="${res.reservationId}">
+                        <input type="hidden" name="status" value="REJECTED">
+                        <button type="submit" class="btn btn-reject w-100 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-regular fa-circle-xmark"></i> Từ chối yêu cầu
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-end mt-3" th:if="${res.status != 'PENDING'}">
+                <a th:href="@{/admin/reservation/delete/{id}(id=${res.reservationId})}"
+                   class="text-danger text-decoration-none small"
+                   onclick="return confirm('Bạn có chắc chắn muốn xóa lịch sử này?')">
+                    <i class="fa-solid fa-trash-can me-1"></i> Xóa lịch sử
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(reservations)}" class="empty-state rsv-card">
+            <i class="fa-solid fa-calendar-xmark fa-4x mb-3 opacity-25"></i>
+            <h5 class="fw-bold">Không tìm thấy yêu cầu nào!</h5>
+            <p>Dữ liệu đặt bàn của chi nhánh này hiện đang trống.</p>
+        </div>
+
+        <nav th:if="${totalPages > 1}" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link rounded-start-3" th:href="@{/admin/reservation(page=${currentPage - 1})}">Trước</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/admin/reservation(page=${i})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                    <a class="page-link rounded-end-3" th:href="@{/admin/reservation(page=${currentPage + 1})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</main>
+<div class="modal fade" id="createReservationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold px-3 pt-3">Tạo đơn đặt bàn mới</h5>
+                <button type="button" class="btn-close me-2 mt-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/admin/reservation/create}" method="post" class="modal-body p-4">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">Khách hàng yêu cầu</label>
+                        <select name="userId" class="form-select bg-light border-0" required>
+                            <option value="">-- Chọn khách hàng trong hệ thống --</option>
+                            <option th:each="u : ${allCustomers}" th:value="${u.userId}" th:text="${u.fullName + ' - ' + u.phone}"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Thời gian đặt</label>
+                        <input type="datetime-local" name="reservationTime" class="form-control bg-light border-0" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Số lượng người</label>
+                        <input type="number" name="numberOfPeople" class="form-control bg-light border-0" min="1" value="2" required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">Ghi chú yêu cầu</label>
+                        <textarea name="description" class="form-control bg-light border-0" rows="3" placeholder="Ví dụ: Bàn gần cửa sổ, tổ chức sinh nhật..."></textarea>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <button type="submit" class="btn btn-danger w-100 py-3 rounded-3 fw-bold">
+                            <i class="fa-solid fa-paper-plane me-2"></i>Xác nhận tạo đơn
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

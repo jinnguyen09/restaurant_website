@@ -2,6 +2,9 @@ package restaurant.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,30 +15,41 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
+    @Column(name = "user_id")
+    private Long userId;
 
+    @Column(name = "full_name")
     private String fullName;
 
     @Column(unique = true, nullable = false)
     private String email;
 
+    private String avatar;
     private String phone;
     private String password;
 
-    private int points = 50;
+    private int points = 0;
 
+    @Column(name = "create_at")
     private LocalDateTime createdAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<UserRole> userRoles = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rank_id", referencedColumnName = "rank_id")
+    private Ranked rank;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
+
+        if (this.rank == null) {
+            Ranked defaultRank = new Ranked();
+            defaultRank.setRank_id(1);
+            this.rank = defaultRank;
+        }
     }
 }

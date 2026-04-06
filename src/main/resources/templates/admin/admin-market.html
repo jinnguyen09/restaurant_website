@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Quản Trị - PHỞ HẨM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="/css/admin.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+    .search-bar { border-radius: 10px; background: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .btn-add { background-color: #c62828; color: white; border-radius: 8px; font-weight: 500; text-decoration: none; transition: 0.3s; }
+    .btn-add:hover { background-color: #a52121; color: white; transform: translateY(-2px); }
+
+    .filter-tag { border-radius: 8px; padding: 6px 18px; margin-right: 8px; border: 1px solid #dee2e6; color: #333; background: white; text-decoration: none; transition: 0.3s; display: inline-block; margin-bottom: 5px; }
+    .filter-tag.active { background-color: #c62828; color: white; border-color: #c62828; }
+    .filter-tag:hover:not(.active) { background-color: #eee; }
+
+    .stat-card { border: none; border-radius: 15px; padding: 20px; transition: transform 0.3s; background: white; height: 100%; }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-icon { font-size: 1.5rem; margin-bottom: 10px; }
+    .stat-value { font-size: 2rem; font-weight: bold; }
+
+    .product-card { border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s; position: relative; height: 100%; background: white; }
+    .product-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+
+    .product-card.disabled-item .card-img-top,
+    .product-card.disabled-item .card-title,
+    .product-card.disabled-item .text-muted,
+    .product-card.disabled-item .price-current,
+    .product-card.disabled-item .price-old,
+    .product-card.disabled-item .badge-hot,
+    .product-card.disabled-item .badge-discount {
+      opacity: 0.5;
+      filter: grayscale(0.8);
+    }
+
+    .product-card.disabled-item .badge-sold-out {
+      opacity: 1 !important;
+      filter: none !important;
+    }
+
+    .product-card.disabled-item .card-body .d-flex:last-child {
+      opacity: 1 !important;
+      filter: none !important;
+    }
+
+    .btn-edit, .btn-delete {
+      position: relative;
+      z-index: 10;
+    }
+    .card-img-top { height: 200px; object-fit: cover; }
+
+    .badge-discount { position: absolute; top: 10px; left: 10px; background: #ff4d4d; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; z-index: 5; font-size: 0.75rem; }
+    .badge-hot { position: absolute; top: 10px; right: 10px; background: linear-gradient(45deg, #f093fb, #f5576c); color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; z-index: 5; font-size: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .badge-sold-out { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); color: white; padding: 8px 15px; border-radius: 8px; font-weight: bold; z-index: 6; white-space: nowrap; pointer-events: none; }
+
+    .price-current { color: #c62828; font-weight: bold; font-size: 1.25rem; }
+    .price-old { text-decoration: line-through; color: #999; font-size: 0.9rem; margin-left: 8px; }
+
+    .btn-edit { border: 1px solid #0d6efd; color: #0d6efd; border-radius: 8px; width: 48%; text-decoration: none; text-align: center; display: inline-block; padding: 8px 0; transition: 0.2s; }
+    .btn-edit:hover { background: #0d6efd; color: white; }
+    .btn-delete { border: 1px solid #dc3545; color: #dc3545; border-radius: 8px; width: 48%; text-decoration: none; text-align: center; display: inline-block; padding: 8px 0; transition: 0.2s; cursor: pointer; }
+    .btn-delete:hover { background: #dc3545; color: white; }
+
+    .text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  </style>
+</head>
+<body>
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='market')}"></div>
+
+<main class="container py-4">
+
+  <div class="d-flex align-items-center p-3 bg-white shadow-sm rounded-4 border-start border-danger border-4 mb-4">
+    <div class="bg-danger-subtle p-2 rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+      <i class="fa-solid fa-shop text-danger fs-5"></i>
+    </div>
+    <div class="flex-grow-1">
+      <p class="text-muted small mb-0">Hệ thống đang quản lý mua sắm tại:</p>
+      <h4 th:class="${currentBranch == null ? 'fw-bold mb-0 text-danger' : 'fw-bold mb-0 text-dark'}"
+          th:text="${currentBranch != null ? currentBranch.name : 'VUI LÒNG CHỌN CHI NHÁNH!'}">
+      </h4>
+    </div>
+  </div>
+
+  <div th:if="${success}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" style="border-radius: 12px;">
+    <i class="fa-solid fa-circle-check me-2"></i> <span th:text="${success}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <form th:action="@{/admin/market}" method="get" class="search-bar d-flex align-items-center mb-4">
+    <div class="input-group me-3">
+      <span class="input-group-text bg-light border-0"><i class="fa fa-search text-muted"></i></span>
+      <input type="text" name="keyword" th:value="${keyword}" class="form-control bg-light border-0" placeholder="Tìm kiếm sản phẩm mua sắm...">
+    </div>
+    <a th:href="@{/admin/market/add}" class="btn btn-add px-4 py-2 flex-shrink-0">
+      <i class="fa fa-plus me-2"></i> Thêm sản phẩm
+    </a>
+  </form>
+
+  <div class="d-flex flex-wrap mb-4">
+    <a th:href="@{/admin/market}" class="filter-tag" th:classappend="${categoryId == null} ? 'active'">Tất cả</a>
+    <th:block th:each="cat : ${categories}">
+      <a th:href="@{/admin/market(categoryId=${cat.categoryId})}"
+         class="filter-tag"
+         th:classappend="${categoryId == cat.categoryId} ? 'active'"
+         th:text="${cat.categoryName}">Danh mục</a>
+    </th:block>
+  </div>
+
+  <div class="row g-3 mb-5 text-center">
+    <div class="col-6 col-md-3">
+      <div class="stat-card shadow-sm border-0" style="background-color: #e3f2fd; color: #0d47a1;">
+        <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
+        <div class="stat-value" th:text="${totalItemsCount != null ? totalItemsCount : 0}">0</div>
+        <div class="small fw-bold">Sản phẩm hiện có</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="stat-card shadow-sm border-0" style="background-color: #e8f5e9; color: #1b5e20;">
+        <div class="stat-icon"><i class="fa-solid fa-square-check"></i></div>
+        <div class="stat-value" th:text="${inStock != null ? inStock : 0}">0</div>
+        <div class="small fw-bold">Còn hàng</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="stat-card shadow-sm border-0" style="background-color: #ffebee; color: #b71c1c;">
+        <div class="stat-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <div class="stat-value" th:text="${outOfStock != null ? outOfStock : 0}">0</div>
+        <div class="small fw-bold">Hết hàng</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="stat-card shadow-sm border-0" style="background-color: #f3e5f5; color: #4a148c;">
+        <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div class="stat-value" th:text="${#numbers.formatInteger(totalInventory ?: 0, 0, 'POINT')}">0</div>
+        <div class="small fw-bold">Tổng tồn kho (SL)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4" th:each="item : ${products}">
+      <div class="card product-card" th:classappend="${!item.isAvailable or item.stockQuantity == 0} ? 'disabled-item' : ''">
+
+        <th:block th:if="${item.discountPrice != null and item.discountPrice < item.price}">
+          <span class="badge-discount"><i class="fa-solid fa-tag"></i> GIẢM GIÁ</span>
+        </th:block>
+
+        <th:block th:if="${item.isFeatured}">
+          <span class="badge-hot"><i class="fa-solid fa-fire"></i> HOT DEAL</span>
+        </th:block>
+
+        <div th:if="${item.stockQuantity == 0}" class="badge-sold-out">
+          <i class="fa-solid fa-box-open"></i> HẾT HÀNG
+        </div>
+
+        <img th:src="${item.product.imageUrl != null ? item.product.imageUrl : 'https://via.placeholder.com/500x300'}"
+             class="card-img-top" th:alt="${item.product.name}">
+
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title fw-bold text-truncate mb-0" th:text="${item.product.name}">Tên sản phẩm</h5>
+            <span th:if="${!item.isAvailable}" class="badge bg-secondary" style="font-size: 0.6rem;">NGỪNG BÁN</span>
+          </div>
+
+          <p class="text-muted small text-truncate-2" th:text="${item.product.description}" style="height: 40px;">Mô tả ngắn</p>
+
+          <div class="mb-3">
+            <th:block th:if="${item.discountPrice != null and item.discountPrice < item.price}">
+              <span class="price-current" th:text="${#numbers.formatInteger(item.discountPrice, 0, 'POINT')} + 'đ'"></span>
+              <span class="price-old" th:text="${#numbers.formatInteger(item.price, 0, 'POINT')} + 'đ'"></span>
+            </th:block>
+            <th:block th:unless="${item.discountPrice != null and item.discountPrice < item.price}">
+              <span class="price-current" th:text="${#numbers.formatInteger(item.price, 0, 'POINT')} + 'đ'"></span>
+            </th:block>
+          </div>
+
+          <div class="d-flex justify-content-between text-muted small mb-3">
+            <span th:classappend="${item.stockQuantity == 0} ? 'text-danger fw-bold' : ''">
+               <i class="fa-solid fa-warehouse me-1"></i>
+               <span th:text="'Kho: ' + ${item.stockQuantity != null ? item.stockQuantity : 0}"></span>
+            </span>
+            <span th:text="${item.product.unit != null ? item.product.unit : 'Sản phẩm'}"></span>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a th:href="@{/admin/market/edit/{id}(id=${item.product.productId})}" class="btn btn-edit">
+              <i class="fa fa-edit me-1"></i> Sửa
+            </a>
+            <div class="btn btn-delete btn-delete-confirm"
+                 th:data-id="${item.product.productId}"
+                 th:data-name="${item.product.name}">
+              <i class="fa fa-trash me-1"></i> Xóa
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" width="80" class="mb-3 opacity-25" alt="Empty">
+    <p class="text-muted">Không tìm thấy sản phẩm mua sắm nào.</p>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('.btn-delete-confirm').forEach(button => {
+    button.addEventListener('click', function() {
+      const id = this.getAttribute('data-id');
+      const name = this.getAttribute('data-name');
+      if (confirm('Bạn có chắc chắn muốn xóa sản phẩm "' + name + '" không?')) {
+        window.location.href = '/admin/market/delete/' + id;
+      }
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+      setTimeout(() => {
+        if (typeof bootstrap !== 'undefined') {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }
+      }, 3000);
+    });
+  });
+</script>
+</body>
+</html>

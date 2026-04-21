@@ -39,7 +39,7 @@ public class SecurityConfig {
                                 .requestMatchers("/uploads/**").permitAll()
                                 .requestMatchers("/select-branch/**").permitAll()
                                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER", "STAFF")
-                        .requestMatchers("/", "/home","/menu","/reservation","/market","/blog","/contact","/sign-in","/sign-up").permitAll()
+                        .requestMatchers("/", "/home","/menu", "/food-detail" ,"/reservation","/market","/blog","/contact","/sign-in","/sign-up").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)

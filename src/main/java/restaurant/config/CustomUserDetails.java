@@ -47,6 +47,10 @@ public class CustomUserDetails implements UserDetails {
         return user.getUserId();
     }
 
+    public String getPhone() {
+        return user.getPhone();
+    }
+
     public String getFullName() {
         return user.getFullName();
     }

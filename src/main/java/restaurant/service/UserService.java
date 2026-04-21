@@ -15,7 +15,11 @@ import restaurant.entity.*;
 import restaurant.repository.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -160,7 +164,7 @@ public class UserService {
         return isRankUp;
     }
 
-    public List<CustomerDTO> getCustomerStats(String keyword, Integer branchId) {
+    public List<CustomerDTO> getCustomerStats(String keyword) {
         return userRepository.findAllCustomerStats(keyword);
     }
 
@@ -238,8 +242,15 @@ public class UserService {
         UserRole userRole = new UserRole();
         userRole.setUser(savedUser);
 
-        Role role = roleRepository.findById(roleId.longValue())
-                .orElseThrow(() -> new RuntimeException("Role không tồn tại"));
+        Role role;
+        if (roleId == null) {
+            role = roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new RuntimeException("Lỗi hệ thống: Không tìm thấy quyền ROLE_USER trong DB!"));
+        } else {
+            role = roleRepository.findById(roleId.longValue())
+                    .orElseThrow(() -> new RuntimeException("Lỗi: Quyền hạn (Role ID: " + roleId + ") không tồn tại!"));
+        }
+
         userRole.setRole(role);
 
         userRole.setRestaurantId(restaurantId);
@@ -249,5 +260,38 @@ public class UserService {
 
     public Object getAllCustomers() {
         return userRepository.findAll();
+    }
+
+    public List<User> getInternalUsersByBranch(Integer branchId) {
+        List<String> roleNames = List.of("ROLE_STAFF", "ROLE_ADMIN", "ROLE_MANAGER");
+        if (branchId == null) {
+            return userRepository.findUsersByRoleNames(roleNames);
+        }
+        return userRepository.findInternalUsersByBranch(roleNames, branchId);
+    }
+
+    public List<CustomerDTO> getStaffStats(String keyword, Integer branchId) {
+        return userRepository.findAllStaffStats(keyword, branchId);
+    }
+
+    public List<CustomerDTO> searchUsersForGift(String keyword) {
+        List<User> users = userRepository.searchByEmailOrPhone(keyword);
+
+        return users.stream().map(user -> {
+            CustomerDTO dto = new CustomerDTO();
+            dto.setUserId(user.getUserId());
+            dto.setFullName(user.getFullName());
+            dto.setEmail(user.getEmail());
+            dto.setPhone(user.getPhone());
+            if (user.getRank() != null) {
+                dto.setRankName(user.getRank().getRankName());
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

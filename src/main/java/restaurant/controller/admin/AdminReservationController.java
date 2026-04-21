@@ -3,14 +3,18 @@ package restaurant.controller.admin;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import restaurant.config.CustomUserDetails;
 import restaurant.entity.Reservation;
 import restaurant.entity.User;
 import restaurant.service.ReservationService;
 import restaurant.service.UserService;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/reservation")
@@ -23,21 +27,31 @@ public class AdminReservationController {
     @GetMapping
     public String listReservations(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            HttpSession session, Model model) {
+            @RequestParam(value = "filter", defaultValue = "all") String filter,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            HttpSession session, Model model,
+            Authentication authentication) {
 
         Integer branchId = (Integer) session.getAttribute("currentBranchId");
-        if (branchId == null) {
-            return "redirect:/admin/home";
-        }
+        if (branchId == null) return "redirect:/admin/home";
 
         int pageSize = 10;
-        Page<Reservation> reservationPage = reservationService.getReservationsByBranch(branchId, page, pageSize);
+        Page<Reservation> reservationPage = reservationService.searchReservations(branchId, filter, keyword, page, pageSize);
+
+        List<User> internalUsers = userService.getInternalUsersByBranch(branchId);
+
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails currentUser) {
+            model.addAttribute("currentUser", currentUser);
+        }
 
         model.addAttribute("reservations", reservationPage.getContent());
-        model.addAttribute("allCustomers", userService.getAllCustomers());
+        model.addAttribute("allCustomers", internalUsers);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", reservationPage.getTotalPages());
         model.addAttribute("totalItems", reservationPage.getTotalElements());
+
+        model.addAttribute("filter", filter);
+        model.addAttribute("keyword", keyword);
 
         model.addAttribute("activePage", "reservation");
         return "admin/admin-reservation";
@@ -47,16 +61,13 @@ public class AdminReservationController {
     public String updateStatus(@RequestParam("id") Long id,
                                @RequestParam("status") String status,
                                HttpSession session,
-                               RedirectAttributes redirectAttributes) {
-
+                               RedirectAttributes ra) {
         Integer branchId = (Integer) session.getAttribute("currentBranchId");
-        if (branchId == null) return "redirect:/admin/reservation";
-
         try {
             reservationService.updateStatus(branchId, id, status);
-            redirectAttributes.addFlashAttribute("success", "Cập nhật trạng thái thành công!");
+            ra.addFlashAttribute("success", "Cập nhật trạng thái thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/reservation";
     }
@@ -64,50 +75,32 @@ public class AdminReservationController {
     @GetMapping("/delete/{id}")
     public String deleteReservation(@PathVariable Long id,
                                     HttpSession session,
-                                    RedirectAttributes redirectAttributes) {
-
+                                    RedirectAttributes ra) {
         Integer branchId = (Integer) session.getAttribute("currentBranchId");
-        if (branchId == null) return "redirect:/admin/reservation";
-
         try {
             reservationService.removeReservationFromBranch(branchId, id);
-            redirectAttributes.addFlashAttribute("success", "Đã xóa đơn đặt bàn!");
+            ra.addFlashAttribute("success", "Đã xóa đơn đặt bàn!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi khi xóa: " + e.getMessage());
+            ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/reservation";
     }
 
-    // 4. (Tùy chọn) Lưu/Sửa nếu bạn dùng Form riêng
     @PostMapping("/save")
     public String saveReservation(@ModelAttribute("reservation") Reservation reservation,
                                   HttpSession session,
-                                  RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes ra) {
         Integer branchId = (Integer) session.getAttribute("currentBranchId");
         try {
-            reservationService.saveReservationFromBranch(reservation, branchId);
-            redirectAttributes.addFlashAttribute("success", "Lưu thông tin thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
-        }
-        return "redirect:/admin/reservation";
-    }
-
-    @PostMapping("/create")
-    public String createReservation(@ModelAttribute Reservation reservation,
-                                    @RequestParam("userId") Long userId,
-                                    HttpSession session,
-                                    RedirectAttributes redirectAttributes) {
-        Integer branchId = (Integer) session.getAttribute("currentBranchId");
-        try {
-            User user = new User();
-            user.setUserId(userId);
-            reservation.setUser(user);
+            if (reservation.getReservationId() == null &&
+                    (reservation.getUser() == null || reservation.getUser().getUserId() == null)) {
+                throw new RuntimeException("Vui lòng chọn khách hàng!");
+            }
 
             reservationService.saveReservationFromBranch(reservation, branchId);
-            redirectAttributes.addFlashAttribute("success", "Thêm mới đơn đặt bàn thành công!");
+            ra.addFlashAttribute("success", "Lưu thông tin thành công!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
+            ra.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
         return "redirect:/admin/reservation";
     }

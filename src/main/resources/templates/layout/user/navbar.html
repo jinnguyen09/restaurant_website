@@ -110,6 +110,10 @@
                                 <span class="text-lg opacity-60">👤</span> Hồ sơ
                             </a>
 
+                            <a th:href="@{/my-vouchers}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
+                                <span class="text-lg opacity-60"></span> Voucher
+                            </a>
+
                             <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_STAFF')"
                                th:href="@{/admin/home}"
                                class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">

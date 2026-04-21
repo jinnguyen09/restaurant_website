@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -52,4 +53,6 @@ public class User {
             this.rank = defaultRank;
         }
     }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserVoucher> userVouchers;
 }

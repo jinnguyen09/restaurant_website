@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý Voucher - PHỞ HẨM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="/css/admin.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .voucher-card {
+      border: none; border-radius: 20px; transition: 0.3s;
+      border-left: 6px solid #ff4757; height: 100%; position: relative; background: white;
+      z-index: 1;
+    }
+    .col-md-4:has(.show) { z-index: 99; position: relative; }
+    .voucher-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
+    .badge-active { background-color: #e3fcef; color: #00875a; border-radius: 50px; padding: 5px 12px; }
+    .badge-expired { background-color: #ffebe6; color: #de350b; border-radius: 50px; padding: 5px 12px; }
+    .discount-val { font-size: 2rem; font-weight: 800; color: #ff4757; line-height: 1; }
+    .modal-content { border-radius: 25px; border: none; overflow: visible; }
+    .branch-badge { font-size: 0.75rem; background: #f1f2f6; color: #57606f; padding: 4px 10px; border-radius: 8px; display: inline-block; }
+
+    #branchSelectGroup { transition: all 0.3s ease; }
+    .fade-in { animation: fadeIn 0.4s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-light">
+
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='voucher')}"></div>
+
+<div class="container py-5">
+  <div th:if="${success}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4" role="alert">
+    <i class="fa-solid fa-circle-check me-2"></i> <span th:text="${success}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-4" role="alert">
+    <i class="fa-solid fa-circle-exclamation me-2"></i> <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+      <h2 class="fw-bold mb-1">
+        Quản lý <span class="text-danger">Voucher</span>
+        <span class="fs-5 text-muted fw-normal"
+              th:text="${isAdmin ? ' - Hệ thống' : ' - ' + session.currentBranchName}"></span>
+      </h2>
+      <p class="text-muted mb-0">Phát hành ưu đãi cho khách hàng trên toàn bộ mạng lưới Phở Hẩm</p>
+    </div>
+    <button class="btn btn-danger rounded-4 px-4 py-2 fw-bold shadow-sm" onclick="prepareAddVoucherModal()">
+      <i class="fa-solid fa-plus me-2"></i>Phát hành Voucher
+    </button>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-4" th:each="v : ${vouchers}">
+      <div class="card voucher-card shadow-sm">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span th:if="${v.expiryDate != null}"
+                  th:class="${v.expiryDate.isAfter(#temporals.createNow()) ? 'badge-active' : 'badge-expired'}" class="small fw-bold">
+                <i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i>
+                <span th:text="${v.expiryDate.isAfter(#temporals.createNow()) ? 'Đang hiệu lực' : 'Hết hạn'}"></span>
+            </span>
+
+            <div class="dropdown">
+              <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end border-0 shadow p-2">
+                <li><a class="dropdown-item rounded-3 mb-1" href="javascript:void(0)" th:onclick="'openGiftModal(' + ${v.voucherId} + ')'"><i class="fa-solid fa-paper-plane me-2 text-success"></i>Gửi tặng khách</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item rounded-3 mb-1" href="javascript:void(0)" th:data-id="${v.voucherId}" th:data-name="${v.voucherName}" th:data-desc="${v.description}" th:data-amount="${v.discountAmount}" th:data-type="${v.applyType}" th:data-branch-id="${v.applicableRestaurants != null && !v.applicableRestaurants.isEmpty() ? v.applicableRestaurants[0].restaurant.restaurantId : ''}" th:data-expiry="${#temporals.format(v.expiryDate, 'yyyy-MM-dd HH:mm')}" th:data-min="${v.minOrderValue}" th:data-limit="${v.usageLimit}" onclick="prepareEditVoucherModal(this)"><i class="fa-solid fa-pen me-2 text-primary"></i>Chỉnh sửa</a></li>
+                <li><a class="dropdown-item rounded-3 text-danger" href="javascript:void(0)" th:onclick="'confirmDeleteVoucher(' + ${v.voucherId} + ')'"><i class="fa-solid fa-trash me-2"></i>Xóa mã</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <h5 class="fw-bold text-dark mb-1" th:text="${v.voucherName}">Mã Voucher</h5>
+          <div class="mb-2">
+            <span class="branch-badge">
+              <i class="fa-solid fa-store me-1 text-danger"></i>
+              <span th:text="${v.applyType.name() == 'ALL' ? 'Toàn hệ thống' : (session.currentBranchName != null ? session.currentBranchName : 'Đa chi nhánh')}"></span>
+            </span>
+          </div>
+          <p class="text-muted small mb-3 line-clamp-2" style="min-height: 40px" th:text="${v.description}">Mô tả</p>
+          <div class="discount-val mb-3" th:text="${#numbers.formatDecimal(v.discountAmount, 0, 'COMMA', 0, 'POINT') + 'đ'}">20k</div>
+
+          <div class="mt-3 p-3 bg-light rounded-4">
+            <div class="d-flex justify-content-between mb-1"><span class="text-muted small">Đơn từ:</span><span class="fw-bold small" th:text="${#numbers.formatDecimal(v.minOrderValue, 0, 'COMMA', 0, 'POINT') + 'đ'}">100k</span></div>
+            <div class="d-flex justify-content-between mb-1"><span class="text-muted small">Còn lại:</span><span th:class="${v.usageLimit > 0 ? 'fw-bold small text-success' : 'fw-bold small text-danger'}" th:text="${v.usageLimit > 0 ? v.usageLimit + ' lượt' : 'Hết lượt'}">10 lượt</span></div>
+            <div class="d-flex justify-content-between"><span class="text-muted small">Hết hạn:</span><span class="fw-bold small text-danger" th:text="${#temporals.format(v.expiryDate, 'dd/MM/yyyy')}">13/04/2026</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="voucherModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <form th:action="@{/admin/voucher/save}" method="post" id="voucherForm" class="modal-content shadow-lg p-4">
+      <input type="hidden" name="voucherId" id="modalVoucherId">
+
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="modalVoucherTitle">Phát hành Voucher</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div th:if="${session.currentBranchId != null}">
+          <input type="hidden" name="applyType" value="SPECIFIC">
+          <p class="small text-muted mb-3"><i class="fa-solid fa-info-circle me-1"></i> Voucher này sẽ chỉ áp dụng tại chi nhánh của bạn.</p>
+        </div>
+
+        <div th:if="${isAdmin}" class="mb-4 p-3 bg-danger-subtle rounded-4 border border-danger-subtle">
+          <label class="form-label small fw-bold text-danger">Quyền Admin Tổng</label>
+          <select name="applyType" id="modalApplyType" class="form-select mb-3" onchange="toggleBranchSelect(this.value)">
+            <option value="ALL">Phát hành TOÀN HỆ THỐNG</option>
+            <option value="SPECIFIC">Phát hành cho CHI NHÁNH CỤ THỂ</option>
+          </select>
+
+          <div id="branchSelectGroup" style="display: none;">
+            <select name="restaurantIds" id="modalRestaurantId" class="form-select">
+              <option value="">-- Chọn chi nhánh áp dụng --</option>
+              <option th:each="res : ${restaurants}"
+                      th:value="${res.restaurantId}"
+                      th:text="${res.name}"></option>
+            </select>
+          </div>
+        </div>
+
+        <div th:if="${!isAdmin}">
+          <input type="hidden" name="applyType" value="SPECIFIC">
+          <input type="hidden" name="restaurantIds" th:value="${session.currentBranchId}">
+          <p class="small text-muted mb-3 italic">Voucher sẽ được áp dụng mặc định tại chi nhánh bạn đang quản lý.</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-muted">Tên / Mã Voucher</label>
+          <input type="text" name="voucherName" id="modalVoucherName" class="form-control py-2 rounded-3" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-muted">Mô tả ngắn</label>
+          <textarea name="description" id="modalVoucherDesc" class="form-control rounded-3" rows="2"></textarea>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <label class="form-label small fw-bold text-muted">Mức giảm (đ)</label>
+            <input type="number" name="discountAmount" id="modalVoucherAmount" class="form-control py-2 rounded-3" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-bold text-muted">Đơn tối thiểu (đ)</label>
+            <input type="number" name="minOrderValue" id="modalVoucherMin" class="form-control py-2 rounded-3" required>
+          </div>
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-6">
+            <label class="form-label small fw-bold text-muted">Ngày hết hạn</label>
+            <input type="datetime-local" name="expiryDate" id="modalVoucherExpiry" class="form-control py-2 rounded-3" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-bold text-muted">Giới hạn lượt dùng</label>
+            <input type="number" name="usageLimit" id="modalVoucherLimit" class="form-control py-2 rounded-3" placeholder="Vô hạn">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-4 shadow-sm">Lưu thông tin Voucher</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="giftModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <form th:action="@{/admin/voucher/give}" method="post" class="modal-content shadow-lg p-4">
+      <input type="hidden" name="voucherId" id="giftVoucherId">
+      <div class="modal-header border-0"><h5 class="modal-title fw-bold">Gửi tặng Voucher</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-muted">Hình thức gửi</label>
+          <select name="type" id="giftType" class="form-select py-2 rounded-3" onchange="toggleGiftInput(this.value)">
+            <option value="USER">Gửi cho 1 khách hàng cụ thể</option>
+            <option value="RANK">Gửi theo hạng thành viên</option>
+            <option value="ALL">Gửi cho toàn bộ hệ thống</option>
+          </select>
+        </div>
+        <div class="p-3 bg-warning-subtle rounded-4 mb-4" id="giftWarningAll" style="display: none;">
+          <p class="small text-warning-emphasis mb-0"><i class="fa-solid fa-triangle-exclamation me-1"></i> Lưu ý: Nếu mã do chi nhánh phát hành, khách bắt buộc phải mua tại đúng quán mới dùng được.</p>
+        </div>
+        <div id="giftUserGroup" class="mb-4 position-relative">
+          <label class="form-label small fw-bold text-muted">Tìm kiếm khách hàng</label>
+          <div class="input-group"><span class="input-group-text bg-white border-end-0 rounded-start-3"><i class="fa-solid fa-magnifying-glass text-muted"></i></span><input type="text" id="giftTargetInput" class="form-control py-2 border-start-0 rounded-end-3" placeholder="Nhập SĐT hoặc Email..." onkeyup="searchUsers(this.value)"></div>
+          <input type="hidden" name="target" id="giftTargetValue">
+          <div id="userSuggestions"></div>
+        </div>
+        <div id="giftRankGroup" class="mb-4" style="display: none;"><label class="form-label small fw-bold text-muted">Chọn hạng thành viên</label><select name="rankTarget" class="form-select py-2 rounded-3"><option value="">-- Chọn hạng --</option><option th:each="r : ${ranks}" th:value="${r.rankName}" th:text="${r.rankName}"></option></select></div>
+        <div class="p-3 bg-info-subtle rounded-4 mb-4" id="giftNoteAll" style="display: none;"><p class="small text-info-emphasis mb-0 italic"><i class="fa-solid fa-circle-info me-1"></i> Hệ thống đang chuẩn bị tiến trình gửi mã hàng loạt.</p></div>
+        <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-4 shadow-sm"><i class="fa-solid fa-paper-plane me-2"></i>Xác nhận gửi tặng</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const gModal = new bootstrap.Modal(document.getElementById('giftModal'));
+  const vModal = new bootstrap.Modal(document.getElementById('voucherModal'));
+
+  function toggleBranchSelect(val) {
+    const group = document.getElementById('branchSelectGroup');
+    if (group) {
+      if (val === 'SPECIFIC') {
+        group.style.display = 'block';
+        group.classList.add('fade-in');
+      } else {
+        group.style.display = 'none';
+        const checkboxes = group.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  function prepareAddVoucherModal() {
+    document.getElementById('modalVoucherTitle').innerText = "Phát hành Voucher mới";
+    document.getElementById('voucherForm').reset();
+    document.getElementById('modalVoucherId').value = "";
+
+    // Reset cho Admin Tổng
+    const branchGroup = document.getElementById('branchSelectGroup');
+    if(branchGroup) branchGroup.style.display = 'none';
+
+    vModal.show();
+  }
+
+  function prepareEditVoucherModal(btn) {
+    document.getElementById('modalVoucherTitle').innerText = "Cập nhật Voucher";
+    const voucherId = btn.getAttribute('data-id');
+    document.getElementById('modalVoucherId').value = voucherId;
+    document.getElementById('modalVoucherName').value = btn.getAttribute('data-name');
+    document.getElementById('modalVoucherDesc').value = btn.getAttribute('data-desc');
+    document.getElementById('modalVoucherAmount').value = btn.getAttribute('data-amount');
+    document.getElementById('modalVoucherMin').value = btn.getAttribute('data-min');
+    document.getElementById('modalVoucherLimit').value = btn.getAttribute('data-limit');
+
+    const expiry = btn.getAttribute('data-expiry');
+    if (expiry) document.getElementById('modalVoucherExpiry').value = expiry.replace(' ', 'T');
+
+    const applyTypeSelect = document.getElementById('modalApplyType');
+    const restaurantSelect = document.getElementById('modalRestaurantId');
+
+    if (voucherId) {
+      if (applyTypeSelect) applyTypeSelect.disabled = true;
+      if (restaurantSelect) restaurantSelect.disabled = true;
+
+      const type = btn.getAttribute('data-type');
+      if (applyTypeSelect) applyTypeSelect.value = type;
+      toggleBranchSelect(type);
+
+      if (restaurantSelect) restaurantSelect.value = btn.getAttribute('data-branch-id');
+    } else {
+      if (applyTypeSelect) applyTypeSelect.disabled = false;
+      if (restaurantSelect) restaurantSelect.disabled = false;
+    }
+
+    vModal.show();
+  }
+
+  function openGiftModal(id) { document.getElementById('giftVoucherId').value = id; gModal.show(); }
+
+  function toggleGiftInput(val) {
+    document.getElementById('giftUserGroup').style.display = (val === 'USER') ? 'block' : 'none';
+    document.getElementById('giftRankGroup').style.display = (val === 'RANK') ? 'block' : 'none';
+    document.getElementById('giftNoteAll').style.display = (val === 'ALL') ? 'block' : 'none';
+    document.getElementById('giftWarningAll').style.display = (val === 'ALL') ? 'block' : 'none';
+  }
+
+  function searchUsers(keyword) {
+    const suggestionBox = document.getElementById('userSuggestions');
+    if (keyword.length < 2) { suggestionBox.style.display = 'none'; return; }
+    fetch(`/admin/voucher/search-users?keyword=${keyword}`)
+            .then(res => res.json())
+            .then(data => {
+              suggestionBox.innerHTML = '';
+              if (data.length > 0) {
+                data.forEach(user => {
+                  const div = document.createElement('div');
+                  div.className = 'suggestion-item';
+                  div.innerHTML = `<strong>${user.fullName}</strong> <br> <span class="text-muted small">${user.phone} | ${user.email}</span>`;
+                  div.onclick = () => selectUser(user);
+                  suggestionBox.appendChild(div);
+                });
+                suggestionBox.style.display = 'block';
+              } else { suggestionBox.style.display = 'none'; }
+            });
+  }
+
+  function selectUser(user) {
+    document.getElementById('giftTargetInput').value = `${user.fullName} (${user.phone})`;
+    document.getElementById('giftTargetValue').value = user.email;
+    document.getElementById('userSuggestions').style.display = 'none';
+  }
+
+  function confirmDeleteVoucher(id) {
+    Swal.fire({
+      title: 'Xóa Voucher?',
+      text: "Lưu ý: Không thể xóa nếu khách đã nhận mã. Hãy chỉnh ngày hết hạn để ngưng áp dụng.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ff4757',
+      confirmButtonText: 'Tôi muốn xóa'
+    }).then((result) => { if (result.isConfirmed) window.location.href = `/admin/voucher/delete/${id}`; });
+  }
+</script>
+</body>
+</html>

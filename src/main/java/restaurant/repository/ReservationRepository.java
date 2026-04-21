@@ -28,4 +28,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsByUser_UserIdAndReservationTime(Long userId, LocalDateTime time);
 
     Page<Reservation> findByRestaurant_RestaurantId(Integer branchId, Pageable pageable);
+
+    Page<Reservation> findByRestaurant_RestaurantIdAndReservationTimeBetween(
+            Integer branchId, LocalDateTime start, LocalDateTime end, Pageable pageable);
+
+    Page<Reservation> findByRestaurant_RestaurantIdAndReservationTimeAfter(
+            Integer branchId, LocalDateTime now, Pageable pageable);
+
+    @Query("SELECT r FROM Reservation r WHERE r.restaurant.restaurantId = :branchId " +
+            "AND (r.user.fullName LIKE %:kw% OR r.user.phone LIKE %:kw%)")
+    Page<Reservation> searchByKeyword(@Param("branchId") Integer branchId, @Param("kw") String kw, Pageable pageable);
 }

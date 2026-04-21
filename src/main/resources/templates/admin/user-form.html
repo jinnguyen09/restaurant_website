@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Quản lý người dùng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/css/admin.css" rel="stylesheet">
+    <style>
+        .form-container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .avatar-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 4px solid #f8f9fa; }
+        .btn-save { background-color: #b71c1c; color: white; border-radius: 10px; padding: 12px 30px; border: none; transition: all 0.3s; }
+        .btn-save:hover { background-color: #961515; transform: translateY(-2px); }
+        .form-label { font-weight: 600; color: #495057; font-size: 0.9rem; }
+        .form-control, .form-select { border-radius: 10px; padding: 12px; border: 1px solid #dee2e6; }
+        .form-control:focus { border-color: #b71c1c; box-shadow: 0 0 0 0.25rem rgba(183, 28, 28, 0.1); }
+        .readonly-field { background-color: #f8f9fa !important; cursor: not-allowed; }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container">
+    <div class="form-container">
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <a th:href="${backUrl != null ? backUrl : (isStaffPage == true ? '/admin/staff' : '/admin/customer')}"
+               class="btn btn-light rounded-circle shadow-sm">
+                <i class="fa fa-arrow-left"></i>
+            </a>
+            <h3 class="fw-bold m-0" th:text="${title}">Chỉnh sửa / Thêm mới</h3>
+        </div>
+
+        <div th:if="${error != null}" class="alert alert-danger border-0 shadow-sm mb-4" th:text="${error}"></div>
+
+        <form th:action="@{/admin/customer/save}" th:object="${customer}" method="post">
+            <input type="hidden" th:field="*{userId}"/>
+            <input type="hidden" name="isStaffPage" th:value="${isStaffPage == true}" />
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label">Họ và tên</label>
+                    <input type="text" th:field="*{fullName}" class="form-control" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Email liên hệ</label>
+                    <input type="email" th:field="*{email}" class="form-control" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" th:field="*{phone}" class="form-control" required />
+                </div>
+
+                <div class="col-md-6" th:if="${customer.userId == null}">
+                    <label class="form-label">Mật khẩu khởi tạo</label>
+                    <input type="password" name="password" class="form-control" required minlength="6" />
+                </div>
+
+                <th:block th:if="${isStaffPage == true}">
+                    <div class="col-md-6">
+                        <label class="form-label">Phân quyền nhân sự</label>
+                        <select name="roleId" id="roleSelect" class="form-select"
+                                th:disabled="${customer.userId != null and customer.userId == currentLoggedInId}" required>
+                            <option th:each="r : ${allRoles}"
+                                    th:value="${r.roleId}"
+                                    th:text="${#strings.replace(r.name, 'ROLE_', '')}"
+                                    th:selected="${currentRoleId == r.roleId}">Role</option>
+                        </select>
+                        <input type="hidden" th:if="${customer.userId != null and customer.userId == currentLoggedInId}"
+                               name="roleId" th:value="${currentRoleId}" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Thuộc chi nhánh</label>
+
+                        <div sec:authorize="hasRole('ROLE_ADMIN')">
+                            <select name="restaurantId" id="restaurantSelect" class="form-select"
+                                    th:disabled="${customer.userId != null and customer.userId == currentLoggedInId}">
+                                <option value="">-- Không thuộc chi nhánh (ADMIN) --</option>
+                                <option th:each="res : ${allRestaurants}"
+                                        th:value="${res.restaurantId}"
+                                        th:text="${res.name}"
+                                        th:selected="${currentRestaurantId == res.restaurantId}">Chi nhánh</option>
+                            </select>
+                            <input type="hidden" th:if="${customer.userId != null and customer.userId == currentLoggedInId}"
+                                   name="restaurantId" th:value="${currentRestaurantId}" />
+                        </div>
+
+                        <th:block sec:authorize="!hasRole('ROLE_ADMIN')">
+                            <input type="text" class="form-control readonly-field"
+                                   th:value="${currentBranchName}"
+                                   readonly />
+                            <input type="hidden" name="restaurantId" th:value="${currentRestaurantId}" />
+                        </th:block>
+                    </div>
+                </th:block>
+
+                <div class="col-12 mt-5 d-flex gap-3">
+                    <button type="submit" class="btn btn-save flex-grow-1 fw-bold shadow-sm">
+                        <i class="fa fa-save me-2"></i>
+                        <span th:text="${customer.userId == null ? 'Xác nhận tạo' : 'Lưu thay đổi'}">Lưu</span>
+                    </button>
+                    <a th:href="${backUrl != null ? backUrl : (isStaffPage == true ? '/admin/staff' : '/admin/customer')}"
+                       class="btn btn-outline-secondary flex-grow-1 fw-bold rounded-3 d-flex align-items-center justify-content-center">
+                        Hủy bỏ
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const roleSelect = document.getElementById('roleSelect');
+    const branchSelect = document.getElementById('restaurantSelect');
+
+    function handleRoleChange() {
+        if (!roleSelect || !branchSelect) return;
+
+        if (roleSelect.value === "2") {
+            branchSelect.value = "";
+            branchSelect.disabled = true;
+            branchSelect.style.backgroundColor = "#f8f9fa";
+            branchSelect.removeAttribute('required');
+        } else {
+            if (!roleSelect.disabled) {
+                branchSelect.disabled = false;
+                branchSelect.style.backgroundColor = "#fff";
+                branchSelect.setAttribute('required', 'required');
+            }
+        }
+    }
+
+    if (roleSelect) {
+        roleSelect.addEventListener('change', handleRoleChange);
+        window.addEventListener('load', handleRoleChange);
+    }
+</script>
+</body>
+</html>

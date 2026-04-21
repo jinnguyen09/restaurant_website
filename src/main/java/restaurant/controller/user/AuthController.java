@@ -14,6 +14,8 @@ import restaurant.repository.RoleRepository;
 import restaurant.repository.UserRepository;
 import restaurant.service.UserService;
 
+import java.util.Optional;
+
 @Controller
 public class AuthController {
 
@@ -47,14 +49,14 @@ public class AuthController {
             return "auth/sign-up";
         }
 
-        Role role = roleRepository.findByName("ROLE_USER");
-        if (role == null) {
+        Optional<Role> role = roleRepository.findByName("ROLE_USER");
+        if (role.isEmpty()) {
             model.addAttribute("error", "Hệ thống chưa cấu hình quyền người dùng!");
             return "auth/sign-up";
         }
 
         try {
-            userService.registerNewUser(user, role);
+            userService.registerNewUser(user, role.orElseThrow(() -> new RuntimeException("Role not found")));
         } catch (Exception e) {
             model.addAttribute("error", "Có lỗi xảy ra trong quá trình đăng ký!");
             return "auth/sign-up";

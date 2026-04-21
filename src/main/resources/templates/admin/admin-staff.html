@@ -116,7 +116,7 @@
   </style>
 </head>
 <body>
-<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='customer')}"></div>
+<div th:replace="~{layout/admin/admin-navbar :: header-admin(activePage='staff')}"></div>
 
 <main class="container py-4">
 
@@ -130,8 +130,15 @@
     <span th:text="${error}">Lỗi! Không thể thêm/sửa dữ liệu.</span>
   </div>
 
+  <div class="mb-3">
+    <span class="badge bg-light text-dark border">
+        <i class="fa-solid fa-filter me-1"></i>
+        Đang hiển thị: <strong th:text="${currentBranch != null ? currentBranch.name : 'Tất cả chi nhánh'}"></strong>
+    </span>
+  </div>
+
   <div class="d-flex gap-3 mb-4 align-items-center">
-    <form th:action="@{/admin/customer}" method="get" class="search-box flex-grow-1 mb-0">
+    <form th:action="@{/admin/staff}" method="get" class="search-box flex-grow-1 mb-0">
       <div class="input-group">
         <span class="input-group-text bg-transparent border-0"><i class="fa fa-search text-muted"></i></span>
         <input type="text" name="search" th:value="${keyword}"
@@ -140,103 +147,70 @@
       </div>
     </form>
 
-    <a th:href="@{/admin/customer/add}" class="btn btn-add d-flex align-items-center">
+    <a th:href="@{/admin/staff/add}" class="btn btn-add d-flex align-items-center">
       <i class="fa fa-plus me-2"></i> Thêm mới
     </a>
   </div>
 
-  <div class="customer-list">
-    <div th:each="c : ${customers}" class="customer-card">
-      <div class="d-flex justify-content-between align-items-start mb-4">
-        <div class="d-flex align-items-center gap-3">
-          <img th:if="${c.avatar != null && c.avatar != ''}" th:src="${c.avatar}" class="avatar-img shadow-sm" alt="Avatar">
-          <div th:unless="${c.avatar != null && c.avatar != ''}"
-               class="avatar-circle shadow-sm"
-               th:text="${c.fullName != null ? #strings.substring(c.fullName, 0, 1) : 'K'}">PH</div>
-          <div>
-            <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-              <h5 class="fw-bold mb-0" th:text="${c.fullName}">Nguyễn Văn A</h5>
-            </div>
-
-            <div class="d-flex gap-2 align-items-center">
-              <span class="badge-gold">
-                <i class="fa fa-crown"></i>
-                <span th:text="${c.rankName != null ? c.rankName : 'Thành viên'}">Gold</span>
-              </span>
-              <small class="text-muted fw-bold">[[${c.totalOrders}]] đơn hàng</small>
-            </div>
+  <div th:each="s : ${staffs}" class="customer-card">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <div class="avatar-circle shadow-sm" th:text="${#strings.substring(s.fullName, 0, 1)}">S</div>
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <h5 class="fw-bold mb-0" th:text="${s.fullName}">Tên nhân viên</h5>
+            <span class="badge"
+                  th:classappend="${s.roleName == 'ROLE_ADMIN' ? 'bg-danger' : (s.roleName == 'ROLE_MANAGER' ? 'bg-dark' : 'bg-primary')}"
+                  th:text="${#strings.replace(s.roleName, 'ROLE_', '')}">
+                ROLE
+            </span>
+          </div>
+          <div class="text-danger fw-bold small">
+            <i class="fa-solid fa-location-dot me-1"></i>
+            <span th:text="${s.restaurantName != null ? s.restaurantName : 'Chưa gán chi nhánh'}">Chi nhánh</span>
           </div>
         </div>
-
-        <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')"
-           th:href="@{/admin/customer/edit/{id}(id=${c.userId})}"
-           class="btn btn-detail">
-          <i class="fa-solid fa-pen-to-square me-1"></i> Chỉnh sửa
-        </a>
       </div>
+      <div class="d-flex align-items-center gap-2">
+        <th:block th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')
+                      or (s.roleName != 'ROLE_ADMIN' and s.userId != currentLoggedInId)}">
+          <a th:href="@{/admin/staff/edit/{id}(id=${s.userId})}" class="btn btn-detail">
+            <i class="fa-solid fa-user-gear me-1"></i> Quản lý
+          </a>
+        </th:block>
 
-      <div class="row g-3">
-        <div class="col-lg-5">
-          <div class="row g-2">
-            <div class="col-6">
-              <div class="info-box h-100">
-                <div class="info-label">Email</div>
-                <div class="info-value text-break" th:text="${c.email}">email@example.com</div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="info-box h-100">
-                <div class="info-label">Điểm tích lũy</div>
-                <div class="info-value" th:text="${c.points}">450</div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="info-box h-100">
-                <div class="info-label">Điện thoại</div>
-                <div class="info-value" th:text="${c.phone}">0123...</div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="info-box h-100">
-                <div class="info-label">Thành viên từ</div>
-                <div class="info-value" th:text="${#temporals.format(c.createdAt, 'dd/MM/yyyy')}">29/09/2029</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-7">
-          <div class="row g-3 h-100">
-            <div class="col-md-4">
-              <div class="metric-box metric-blue">
-                <p class="metric-number" th:text="${c.totalOrders}">0</p>
-                <p class="metric-label">Tổng đơn hàng</p>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="metric-box metric-green">
-                <p class="metric-number">
-                  [[${#numbers.formatDecimal(c.totalSpent != null ? c.totalSpent / 1000000.0 : 0, 1, 1)}]]M
-                </p>
-                <p class="metric-label">Tổng chi tiêu</p>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="metric-box metric-pink">
-                <p class="info-label mb-1">Đơn hàng gần nhất</p>
-                <p class="fw-bold mb-0 text-dark">
-                  [[${c.lastOrderDate != null ? #temporals.format(c.lastOrderDate, 'dd/MM/yyyy') : '--/--/----'}]]
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <th:block th:unless="${#authorization.expression('hasRole(''ROLE_ADMIN'')')
+                         or (s.roleName != 'ROLE_ADMIN' and s.userId != currentLoggedInId)}">
+        <span class="badge bg-light text-muted border py-2 px-3">
+            <i class="fa fa-lock me-1"></i> Đã khoá
+        </span>
+        </th:block>
       </div>
     </div>
 
-    <div th:if="${#lists.isEmpty(customers)}" class="text-center py-5">
-      <i class="fa fa-user-slash fa-3x text-muted mb-3"></i>
-      <p class="text-muted">Không tìm thấy khách hàng nào khớp với tìm kiếm.</p>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="info-box">
+          <div class="info-label">Email nội bộ</div>
+          <div class="info-value" th:text="${s.email}">staff@pho-ham.com</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box">
+          <div class="info-label">Số điện thoại</div>
+          <div class="info-value" th:text="${s.phone}">0912...</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box">
+          <div class="info-label">Ngày vào làm</div>
+          <div class="info-value" th:text="${#temporals.format(s.createdAt, 'dd/MM/yyyy')}">01/01/2024</div>
+        </div>
+      </div>
+    </div>
+    <div th:if="${#lists.isEmpty(staffs)}" class="text-center py-5">
+      <i class="fa-solid fa-user-slash fa-3x text-muted mb-3"></i>
+      <p class="text-muted">Không tìm thấy nhân viên nào phù hợp.</p>
     </div>
   </div>
 </main>

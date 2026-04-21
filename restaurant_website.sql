@@ -213,3 +213,72 @@ CREATE TABLE reservation (
 	CONSTRAINT fk_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(restaurant_id)
 );
 
+-- 15. Tạo bảng vouchers (Bảng mã giảm giá)
+CREATE TABLE vouchers (
+    voucher_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    voucher_name VARCHAR(100) NOT NULL,
+    description TEXT,
+    discount_amount DECIMAL(10, 2) NOT NULL COMMENT 'Số tiền giảm giá',
+    expiry_date DATETIME NOT NULL COMMENT 'Ngày hết hạn',
+    usage_limit INT DEFAULT NULL COMMENT 'Giới hạn số lần sử dụng (NULL nếu không giới hạn)',
+    min_order_value DECIMAL(10, 2) DEFAULT 0.00 COMMENT 'Giá trị đơn hàng tối thiểu để áp dụng',
+    apply_type ENUM('ALL', 'SPECIFIC') NOT NULL DEFAULT 'ALL'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 16. Tạo bảng user_vouchers
+CREATE TABLE user_vouchers (
+    user_voucher_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    voucher_id INT UNSIGNED NOT NULL,
+    used_at DATETIME DEFAULT NULL, 
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (voucher_id) REFERENCES vouchers(voucher_id),
+	FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- 17. Tạo bảng voucher_restaurants 
+CREATE TABLE voucher_restaurants (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    voucher_id INT UNSIGNED NOT NULL,
+    restaurant_id SMALLINT UNSIGNED NOT NULL, 
+    
+    -- Đảm bảo không bị lặp lại việc một voucher gán cho cùng một chi nhánh nhiều lần
+    UNIQUE KEY unique_voucher_restaurant (voucher_id, restaurant_id),
+    
+    -- Khai báo các khóa ngoại
+    CONSTRAINT fk_vr_voucher FOREIGN KEY (voucher_id) 
+        REFERENCES vouchers(voucher_id) ON DELETE CASCADE,
+        
+    CONSTRAINT fk_vr_restaurant FOREIGN KEY (restaurant_id) 
+        REFERENCES restaurants(restaurant_id) ON DELETE CASCADE
+);
+
+-- 18. Tạo bảng areas (Khu vực) trước vì tables tham chiếu đến nó
+CREATE TABLE `areas` (
+    `area_id` SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `restaurant_id` SMALLINT UNSIGNED NOT NULL,
+    `area_name` VARCHAR(100) NOT NULL,
+    `description` TEXT,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- Khóa ngoại liên kết tới bảng restaurants (giả sử bảng đó tên là restaurants)
+    CONSTRAINT `fk_areas_restaurant` FOREIGN KEY (`restaurant_id`) 
+        REFERENCES `restaurants` (`restaurant_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 19. Tạo bảng tables (Bàn)
+CREATE TABLE `tables` (
+    `table_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `area_id` SMALLINT UNSIGNED NOT NULL,
+    `restaurant_id` SMALLINT UNSIGNED NOT NULL,
+    `table_number` VARCHAR(20) NOT NULL,
+    `capacity` TINYINT UNSIGNED DEFAULT 4,
+    `status` ENUM('AVAILABLE', 'OCCUPIED', 'RESERVED', 'OUT_OF_SERVICE') DEFAULT 'AVAILABLE',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- Ràng buộc khóa ngoại
+    CONSTRAINT `fk_tables_area` FOREIGN KEY (`area_id`) 
+        REFERENCES `areas` (`area_id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_tables_restaurant` FOREIGN KEY (`restaurant_id`) 
+        REFERENCES `restaurants` (`restaurant_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

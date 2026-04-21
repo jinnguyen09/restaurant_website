@@ -6,7 +6,7 @@
                     <i class="fa-solid fa-bowl-food text-danger fs-4"></i>
                 </div>
                 <div>
-                    <h2 class="fw-bold m-0 fs-4">HƯƠNG VIỆT <span class="fw-light opacity-75">ADMIN</span></h2>
+                    <h2 class="fw-bold m-0 fs-4">TRANG QUẢN TRỊ <span class="fw-light opacity-75">ADMIN</span></h2>
                 </div>
             </div>
 
@@ -96,8 +96,14 @@
             <a th:href="@{/admin/category}" th:classappend="${activePage == 'category'} ? 'active' : ''" class="nav-link-custom">
                 <i class="fa-solid fa-tag me-2"></i>Danh mục
             </a>
+            <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')" th:href="@{/admin/staff}" th:classappend="${activePage == 'staff'} ? 'active' : ''" class="nav-link-custom">
+                <i class="fa-solid fa-user-tie me-2"></i>Quản lý nhân viên
+            </a>
             <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/restaurant/list}" th:classappend="${activePage == 'restaurant'} ? 'active' : ''" class="nav-link-custom">
                 <i class="fa-solid fa-code-branch me-2"></i>Chi nhánh
+            </a>
+            <a th:href="@{/admin/voucher}" th:classappend="${activePage == 'voucher'} ? 'active' : ''" class="nav-link-custom">
+                <i class="fa-solid fa-tag me-2"></i>Voucher
             </a>
         </nav>
     </div>

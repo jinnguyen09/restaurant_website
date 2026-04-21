@@ -11,7 +11,9 @@ import restaurant.entity.Reservation;
 import restaurant.entity.Restaurant;
 import restaurant.repository.ReservationRepository;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +21,24 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
-    public Page<Reservation> getReservationsByBranch(Integer branchId, int page, int size) {
+    public Page<Reservation> searchReservations(Integer branchId, String filter, String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("reservationTime").descending());
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return reservationRepository.searchByKeyword(branchId, keyword, pageable);
+        }
+
+        if ("today".equals(filter)) {
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+            return reservationRepository.findByRestaurant_RestaurantIdAndReservationTimeBetween(branchId, startOfDay, endOfDay, pageable);
+        } else if ("upcoming".equals(filter)) {
+            return reservationRepository.findByRestaurant_RestaurantIdAndReservationTimeAfter(branchId, LocalDateTime.now(), pageable);
+        }
+
         return reservationRepository.findByRestaurant_RestaurantId(branchId, pageable);
     }
+
 
     public Reservation getReservationForBranch(Integer branchId, Long reservationId) {
         return reservationRepository.findById(reservationId)

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" class="scroll-smooth"> <head>
+<html lang="vi" class="scroll-smooth" xmlns:th="http://www.thymeleaf.org"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mua sắm - Phở Hầm</title>
@@ -22,50 +22,81 @@
 
         <section id="menu" class="pb-24 bg-gray-50">
             <div class="flex flex-wrap justify-center gap-4 mb-16 px-4">
-                <button class="px-8 py-3 rounded-full bg-red-600 text-white font-bold shadow-lg shadow-red-200 transition-all scale-105">Tất cả</button>
-                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Thịt khô</button>
-                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Hạt dinh dưỡng</button>
-                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Trái cây sấy</button>
-                <button class="px-8 py-3 rounded-full bg-white border border-gray-200 text-gray-600 font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">Gia vị khô</button>
+                <a th:href="@{/market}"
+                   th:classappend="${categoryId == null} ? 'bg-red-600 text-white shadow-lg shadow-red-200 scale-105' : 'bg-white border-gray-200 text-gray-600'"
+                   class="px-8 py-3 rounded-full font-bold transition-all">Tất cả</a>
+
+                <a th:each="cat : ${categories}"
+                   th:href="@{/market(categoryId=${cat.categoryId})}"
+                   th:text="${cat.categoryName}"
+                   th:classappend="${categoryId == cat.categoryId} ? 'bg-red-600 text-white shadow-lg shadow-red-200 scale-105' : 'bg-white border-gray-200 text-gray-600'"
+                   class="px-8 py-3 rounded-full border font-semibold hover:border-red-600 hover:text-red-600 hover:shadow-md transition-all">
+                    Tên danh mục
+                </a>
             </div>
 
             <div class="max-w-7xl mx-auto px-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    
-                    <div class="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] transition-all duration-500 group border border-gray-50">
+
+                    <div th:each="rp : ${products}"
+                         class="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_50px_-10px_rgba(0,0,0,0.15)] transition-all duration-500 group border border-gray-50">
+
                         <div class="relative h-72 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=800" 
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
-                                alt="Thịt Trâu Gác Bếp">
-                            <div class="absolute top-5 right-5 bg-amber-500 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg">
+                            <img th:src="${rp.product.imageUrl != null ? rp.product.imageUrl : 'https://images.unsplash.com/photo-1599599810694-b5b37304c041?w=800'}"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                                 th:alt="${rp.product.name}">
+
+                            <div th:if="${rp.stockQuantity > 0}" class="absolute top-5 right-5 bg-amber-500 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg">
                                 📦 Đóng gói hút chân không
+                            </div>
+                            <div th:unless="${rp.stockQuantity > 0}" class="absolute top-5 right-5 bg-gray-500 text-white text-[10px] font-bold px-4 py-1.5 rounded-full shadow-lg">
+                                🚫 Tạm hết hàng
                             </div>
                         </div>
 
                         <div class="p-10">
                             <div class="flex justify-between items-start mb-3">
-                                <h3 class="text-2xl font-extrabold text-gray-800 group-hover:text-red-700 transition-colors">Thịt Trâu Gác Bếp</h3>
+                                <h3 class="text-2xl font-extrabold text-gray-800 group-hover:text-red-700 transition-colors"
+                                    th:text="${rp.product.name}">Thịt Trâu Gác Bếp</h3>
                                 <div class="flex items-center text-yellow-400 text-sm">
                                     ★ <span class="text-gray-500 ml-1 font-bold">4.9</span>
                                 </div>
                             </div>
-                            
-                            <p class="text-gray-500 text-sm mb-8 leading-relaxed line-clamp-2">
-                                Thịt trâu tươi Tây Bắc được hun khói bằng củi nhãn, đậm đà gia vị mắc khén, hạt dổi.
-                            </p>
 
-                            <div class="mb-6 flex gap-4">
-                                <span class="text-[11px] bg-gray-100 px-3 py-1 rounded-md text-gray-600 font-bold tracking-wider">HSD: 6 THÁNG</span>
-                                <span class="text-[11px] bg-gray-100 px-3 py-1 rounded-md text-gray-600 font-bold tracking-wider">TL: 500G</span>
+                            <p class="text-gray-500 text-sm mb-8 leading-relaxed line-clamp-2"
+                               th:text="${rp.product.description}">Mô tả sản phẩm...</p>
+
+                            <div class="mb-6 flex flex-wrap gap-3">
+                                <div class="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100">
+                                    <span class="text-amber-600 text-xs">
+                                        <i class="fa-solid fa-box-open"></i>
+                                    </span>
+                                    <span class="text-[11px] text-amber-800 font-bold uppercase tracking-tight"
+                                          th:text="'Số lượng: ' + ${rp.stockQuantity}">Kho: 33</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
+                                    <span class="text-blue-600 text-xs">
+                                        <i class="fa-solid fa-weight-hanging"></i>
+                                    </span>
+                                    <span class="text-[11px] text-blue-800 font-bold uppercase tracking-tight"
+                                          th:text="${rp.product.unit}">TL: 500G</span>
+                                </div>
                             </div>
 
                             <div class="flex justify-between items-center pt-4 border-t border-gray-50">
                                 <div>
                                     <span class="block text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">Giá túi</span>
-                                    <span class="text-red-600 font-black text-2xl">450.000đ</span>
+                                    <span class="text-red-600 font-black text-2xl"
+                                          th:text="${#numbers.formatDecimal(rp.discountPrice != null ? rp.discountPrice : rp.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">450.000đ</span>
                                 </div>
-                                
+
                                 <div class="flex gap-3">
+<!--                                    <a th:href="@{/food-detail(id=${rp.product.productId})}"-->
+<!--                                       class="bg-gray-100 text-gray-600 w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-gray-900 hover:text-white transition-all duration-300">-->
+<!--                                        <i class="fa-solid fa-eye"></i>-->
+<!--                                    </a>-->
+
                                     <button class="bg-red-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-red-700 transition-all duration-300 shadow-lg shadow-red-100 active:scale-90">
                                         <i class="fa-solid fa-cart-shopping"></i>
                                     </button>
@@ -73,15 +104,14 @@
                             </div>
                         </div>
                     </div>
-
-                    </div>
+                </div>
             </div>
         </section>
 
         <section id="cta" class="py-20 bg-gray-900 text-center rounded-t-[3rem]">
             <h2 class="text-3xl font-bold text-white uppercase tracking-widest mb-4">Giao hàng trong khu vực</h2>
             <p class="text-gray-400 mb-8 px-4">Nhận hàng đúng giờ. Kiểm tra hàng trước khi thanh toán.</p>
-            <button class="bg-red-600 text-white px-10 py-4 rounded-full font-bold hover:bg-red-700 transition-all shadow-xl shadow-red-900/20">Đặt hàng ngay</button>
+<!--            <button class="bg-red-600 text-white px-10 py-4 rounded-full font-bold hover:bg-red-700 transition-all shadow-xl shadow-red-900/20">Đặt hàng ngay</button>-->
         </section>
     </main>
 

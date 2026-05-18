@@ -61,17 +61,26 @@ public class ReservationController {
             Integer branchId = (Integer) session.getAttribute("currentBranchId");
             if (branchId == null) branchId = 1;
 
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            java.lang.reflect.Field field = CustomUserDetails.class.getDeclaredField("user");
+            field.setAccessible(true);
+            User loggedInUser = (User) field.get(customUserDetails);
+
             Reservation reservation = new Reservation();
             reservation.setReservationTime(LocalDateTime.of(date, time));
             reservation.setNumberOfPeople(numberOfPeople);
             reservation.setDescription(description);
             reservation.setStatus("PENDING");
 
+            reservation.setUser(loggedInUser);
+
             reservationService.saveReservationFromBranch(reservation, branchId);
 
             redirectAttributes.addFlashAttribute("success", "Đặt bàn thành công tại chi nhánh " +
                     restaurantService.getBranchNameById(branchId) + "!");
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
         }
 

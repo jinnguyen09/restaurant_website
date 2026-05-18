@@ -24,6 +24,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final RestaurantProductRepository restaurantProductRepository;
     private final DiscountRepository discountRepository;
+    private final ReviewService reviewService;
 
     public ProductBranchDTO getProductDtoForBranch(Integer branchId, Long productId) {
         Product p = productRepository.findById(productId)
@@ -118,7 +119,13 @@ public class ProductService {
 
         Page<RestaurantProduct> pageResult = restaurantProductRepository.findByBranchAndFilters(branchId, keyword, parentId, categoryId, pageable);
 
-        pageResult.forEach(this::calculateActiveDiscount);
+        pageResult.forEach(rp -> {
+            this.calculateActiveDiscount(rp);
+
+            rp.setAverageRating(reviewService.getAverageRating(rp.getRestaurantProductId()));
+
+            rp.setReviewCount(reviewService.getReviewCount(rp.getRestaurantProductId()));
+        });
 
         return pageResult;
     }
@@ -160,5 +167,12 @@ public class ProductService {
         stats.put("totalInventory", totalInv != null ? totalInv : 0L);
 
         return stats;
+    }
+
+    public Long getRestaurantProductId(Integer branchId, Long productId) {
+        return restaurantProductRepository
+                .findByRestaurant_RestaurantIdAndProduct_ProductId(branchId, productId)
+                .map(RestaurantProduct::getRestaurantProductId)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại tại chi nhánh này"));
     }
 }

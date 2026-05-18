@@ -41,6 +41,7 @@
           <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Thời gian</th>
           <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-center">Trạng thái</th>
           <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-right">Thao tác</th>
+          <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Cấu hình vận hành</th>
         </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
@@ -77,6 +78,11 @@
                 <i class="fas fa-edit"></i>
               </button>
             </div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="text-xs text-gray-600">Thuế: <span class="font-bold" th:text="${(res.taxRate * 100) + '%'}">8%</span></div>
+            <div class="text-xs text-gray-600">Ship: <span class="font-bold" th:text="${#numbers.formatDecimal(res.defaultShippingFee, 0, 'COMMA', 0, 'POINT') + 'đ'}">15k</span></div>
+            <div class="text-xs text-gray-600">Tích điểm: <span class="font-bold" th:text="${res.pointExchangeRate + 'đ/đ'}">1k/1đ</span></div>
           </td>
         </tr>
         </tbody>
@@ -172,6 +178,26 @@
               <option value="0">Tạm nghỉ</option>
             </select>
           </div>
+
+          <h4 class="font-bold text-blue-600 border-b pb-2 uppercase text-xs tracking-wider pt-4">Tài chính & Điểm thưởng</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Thuế (%)</label>
+              <input type="number" step="0.01" name="taxRate" id="form_tax" class="w-full px-3 py-2 border rounded-lg text-sm bg-blue-50 border-blue-100" placeholder="Ví dụ: 0.08">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Phí Ship mặc định</label>
+              <input type="number" name="defaultShippingFee" id="form_shipping" class="w-full px-3 py-2 border rounded-lg text-sm bg-blue-50 border-blue-100">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Tỷ lệ tích điểm</label>
+              <input type="number" name="pointExchangeRate" id="form_point_exchange" class="w-full px-3 py-2 border rounded-lg text-sm bg-blue-50 border-blue-100" placeholder="1000">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Giá trị 1 điểm (đ)</label>
+              <input type="number" name="pointRedemptionRate" id="form_point_redeem" class="w-full px-3 py-2 border rounded-lg text-sm bg-blue-50 border-blue-100" placeholder="500">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -221,6 +247,11 @@
         document.getElementById('form_close').value = res.closingTime || '';
         document.getElementById('form_capacity').value = res.capacity || 0;
         document.getElementById('form_status').value = res.status;
+
+        document.getElementById('form_tax').value = res.taxRate || 0;
+        document.getElementById('form_shipping').value = res.defaultShippingFee || 0;
+        document.getElementById('form_point_exchange').value = res.pointExchangeRate || 1000;
+        document.getElementById('form_point_redeem').value = res.pointRedemptionRate || 0;
 
         document.getElementById('form_description').value = res.description || '';
         document.getElementById('form_map').value = res.mapUrl || '';

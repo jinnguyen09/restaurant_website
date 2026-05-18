@@ -47,9 +47,13 @@
 
         <div class="flex items-center gap-3">
             <div sec:authorize="isAuthenticated()" class="hidden lg:flex items-center gap-6">
-                <div class="relative mr-2 cursor-pointer group">
+                <div id="open-cart-btn" class="relative mr-2 cursor-pointer group">
                     <i class="fa-solid fa-cart-shopping text-gray-600 group-hover:text-red-600 transition-all"></i>
-                    <span class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                    <span id="cart-badge-count"
+                          th:text="${cartCount != null ? cartCount : 0}"
+                          class="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                        0
+                    </span>
                 </div>
 
                 <div class="relative group cursor-pointer">
@@ -82,7 +86,7 @@
                             </div>
                         </div>
                     </div>
-            </div>
+                </div>
 
                 <div class="relative group">
                     <button class="flex items-center gap-3 p-1.5 pr-4 rounded-2xl hover:bg-gray-50 transition-all duration-300 min-w-0">
@@ -111,7 +115,7 @@
                             </a>
 
                             <a th:href="@{/my-vouchers}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
-                                <span class="text-lg opacity-60"></span> Voucher
+                                <span class="text-lg opacity-60">🎟️</span>Voucher
                             </a>
 
                             <a sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_STAFF')"
@@ -262,23 +266,309 @@
             <div class="flex justify-between items-center p-6 border-b">
                 <div class="flex items-center gap-2 text-red-800">
                     <i class="fa-solid fa-bag-shopping text-xl"></i>
-                    <span class="font-bold text-lg uppercase tracking-tight">Giỏ hàng (0)</span>
+                    <span id="side-cart-title" class="font-bold text-lg uppercase tracking-tight"
+                          th:text="'Giỏ hàng (' + ${cartCount != null ? cartCount : 0} + ')'">Giỏ hàng (0)</span>
                 </div>
                 <button id="close-cart-btn" class="text-gray-400 hover:text-black transition-all">
                     <i class="fa-solid fa-xmark text-2xl"></i>
                 </button>
             </div>
 
-            <div class="flex-1 flex flex-col items-center justify-center p-10 text-center">
-                <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                    <i class="fa-solid fa-basket-shopping text-4xl text-gray-300"></i>
+            <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+
+                <div th:fragment="cart_items_fragment" id="cart-items-wrapper" class="space-y-4">
+                    <input type="hidden" id="temp-total-value"
+                           th:value="${cartTotal != null ? #numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT') : '0'}">
+
+                    <div th:each="item : ${cartItems}" class="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 group animate-fadeIn">
+                        <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                            <img th:src="${item.productImageUrl}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-gray-800 text-sm mb-1 truncate" th:text="${item.productName}"></h4>
+                            <div class="flex justify-between items-center">
+                                <div class="flex flex-col">
+                                    <span th:if="${item.price < item.originalPrice}"
+                                          class="text-gray-400 line-through text-[10px]"
+                                          th:text="${#numbers.formatDecimal(item.originalPrice, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                                    </span>
+                                    <span class="text-red-600 font-black text-sm" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center gap-2 bg-white border border-gray-100 rounded-lg p-1 shadow-sm">
+                                    <button th:onclick="'updateQuantity(' + ${item.restaurantProductId} + ', -1)'"
+                                            class="w-6 h-6 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-md transition-all">-</button>
+                                    <span class="text-xs font-black text-gray-700 min-w-[20px] text-center" th:text="${item.quantity}">1</span>
+                                    <button th:onclick="'updateQuantity(' + ${item.restaurantProductId} + ', 1)'"
+                                            class="w-6 h-6 flex items-center justify-center text-gray-500 hover:bg-gray-100 rounded-md transition-all">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button th:onclick="'removeFromCart(' + ${item.restaurantProductId} + ')'"
+                                class="text-gray-300 hover:text-red-600 self-start transition-colors p-1">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div id="empty-cart-msg" th:if="${#lists.isEmpty(cartItems)}" class="h-full flex flex-col items-center justify-center p-10 text-center">
+                        <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-basket-shopping text-4xl text-gray-300"></i>
+                        </div>
+                        <h3 class="text-gray-500 font-medium">Giỏ hàng của bạn đang trống</h3>
+                        <p class="text-gray-400 text-sm mt-2">Hãy chọn món ăn ngon từ thực đơn để tiếp tục mua sắm.</p>
+                        <button th:onclick="|location.href='@{/menu}'|" class="mt-8 px-8 py-3 bg-red-700 text-white font-bold rounded-xl shadow-lg hover:bg-red-800 transition-all uppercase text-sm">
+                            Quay lại thực đơn
+                        </button>
+                    </div>
                 </div>
-                <h3 class="text-gray-500 font-medium">Giỏ hàng của bạn đang trống</h3>
-                <p class="text-gray-400 text-sm mt-2">Hãy chọn món ăn ngon từ thực đơn để tiếp tục mua sắm.</p>
-                <button th:onclick="|location.href='@{/menu}'|" class="mt-8 px-8 py-3 bg-red-700 text-white font-bold rounded-xl shadow-lg hover:bg-red-800 transition-all uppercase text-sm">
-                    Quay lại thực đơn
+            </div>
+
+            <div id="cart-footer" class="p-6 border-t bg-gray-50" th:classappend="${cartCount > 0} ? '' : 'hidden'">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-500 font-medium">Tổng cộng:</span>
+                    <span id="cart-total-price" class="text-xl font-black text-red-600"
+                          th:text="${cartTotal != null ? #numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">0đ</span>
+                </div>
+                <button onclick="proceedToCheckout()"
+                        id="btn-checkout"
+                        class="block w-full py-4 bg-red-600 text-white text-center rounded-2xl font-bold shadow-lg hover:bg-red-700 transition-all uppercase tracking-wider disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    <span id="btn-text">THANH TOÁN NGAY</span>
+                    <span id="btn-loader" class="hidden animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full ml-2"></span>
                 </button>
             </div>
         </div>
     </div>
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
+            const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.add-to-cart-btn');
+                if (btn) {
+                    e.preventDefault();
+                    const productId = btn.getAttribute('data-product-id');
+
+                    const quantityInput = document.getElementById('quantity');
+                    const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+
+                    if (productId) {
+                        addToCart(productId, quantity, csrfToken, csrfHeader);
+                    }
+                }
+            });
+        });
+
+        function addToCart(productId, quantity, token, header) {
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', [header]: token },
+                body: JSON.stringify({ productId: productId, quantity: quantity })
+            })
+                .then(response => {
+                    if (response.status === 401) {
+                        Swal.fire({
+                            title: 'Chưa đăng nhập',
+                            text: 'Vui lòng đăng nhập để thực hiện chức năng này!',
+                            icon: 'info',
+                            confirmButtonText: 'Đến trang đăng nhập',
+                            confirmButtonColor: '#dc2626'
+                        }).then(() => {
+                            window.location.href = '/sign-in';
+                        });
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.success) {
+                        const badge = document.getElementById('cart-badge-count');
+                        if (badge) badge.innerText = data.cartCount;
+
+                        loadCartItems();
+
+                        const sideCart = document.getElementById('side-cart');
+                        const cartContent = document.getElementById('cart-content');
+                        if (sideCart && cartContent) {
+                            sideCart.classList.remove('hidden');
+                            setTimeout(() => cartContent.classList.remove('translate-x-full'), 10);
+                        }
+                    }
+                })
+                .catch(err => console.error("Lỗi kết nối API:", err));
+        }
+
+        function loadCartItems() {
+            fetch('/api/cart/render')
+                .then(response => response.text())
+                .then(html => {
+                    const container = document.getElementById('cart-items-container');
+                    const sideTitle = document.getElementById('side-cart-title');
+                    const footer = document.getElementById('cart-footer');
+
+                    if (container) {
+                        container.innerHTML = html;
+
+                        const totalVal = document.getElementById('temp-total-value');
+                        const totalDisplay = document.getElementById('cart-total-price');
+
+                        if (totalVal && totalDisplay) {
+                            totalDisplay.innerText = totalVal.value + 'đ';
+                            if (footer) footer.classList.remove('hidden');
+                        }
+
+                        if (sideTitle) {
+                            const itemCount = container.querySelectorAll('.group').length;
+                            sideTitle.innerText = `Giỏ hàng (${itemCount})`;
+                        }
+                    }
+                })
+                .catch(err => console.error("Lỗi khi tải lại giỏ hàng:", err));
+        }
+
+        function updateQuantity(productId, delta) {
+            const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
+            const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({ productId: productId, quantity: delta })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('cart-badge-count').innerText = data.cartCount;
+                        loadCartItems();
+                    }
+                });
+        }
+
+        function removeFromCart(productId) {
+            Swal.fire({
+                title: 'Xác nhận xóa?',
+                text: "Món ăn này sẽ bị loại khỏi giỏ hàng của bạn!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy',
+                borderRadius: '1.5rem',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-6 py-3 font-bold',
+                    cancelButton: 'rounded-xl px-6 py-3 font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
+                    const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+
+                    fetch(`/api/cart/remove/${productId}`, {
+                        method: 'DELETE',
+                        headers: { [csrfHeader]: csrfToken }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                    timerProgressBar: true
+                                });
+
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Đã xóa món ăn'
+                                });
+
+                                document.getElementById('cart-badge-count').innerText = data.cartCount;
+                                loadCartItems();
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Lỗi!', 'Không thể kết nối đến máy chủ.', 'error');
+                        });
+                }
+            });
+        }
+        function proceedToCheckout() {
+            const cartWrapper = document.getElementById('cart-items-wrapper');
+            if (!cartWrapper || cartWrapper.querySelectorAll('[th\\:each], .flex.gap-4').length === 0) {
+                alert("Giỏ hàng của bạn đang trống!");
+                return;
+            }
+
+            const btn = document.getElementById('btn-checkout');
+            const btnText = document.getElementById('btn-text');
+            const loader = document.getElementById('btn-loader');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            btnText.innerText = "ĐANG CHUYỂN HƯỚNG...";
+            loader.classList.remove('hidden');
+
+            window.location.href = '/checkout';
+        }
+
+        window.addEventListener('pageshow', function(event) {
+            const btn = document.getElementById('btn-checkout');
+            const btnText = document.getElementById('btn-text');
+            const loader = document.getElementById('btn-loader');
+
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                btnText.innerText = "THANH TOÁN NGAY";
+                loader.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lấy biến từ Session thông qua Thymeleaf
+            const showConfirm = /*[[${session.showConfirmClearCart != null ? session.showConfirmClearCart : false}]]*/ false;
+            const pendingId = /*[[${session.pendingBranchId != null ? session.pendingBranchId : 0}]]*/ 0;
+            const targetUrl = /*[[${session.targetUrl != null ? session.targetUrl : '/home'}]]*/ '/home';
+
+            console.log("Popup Switch Status:", showConfirm, "Target ID:", pendingId);
+
+            if (showConfirm && pendingId !== 0) {
+                Swal.fire({
+                    title: 'Đổi chi nhánh?',
+                    text: "Giỏ hàng hiện tại sẽ bị xóa nếu bạn đổi sang chi nhánh khác. Bạn có muốn tiếp tục?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    confirmButtonText: 'Đồng ý, xóa giỏ hàng',
+                    cancelButtonText: 'Hủy bỏ',
+                    borderRadius: '1.5rem'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
+                        const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+
+                        fetch('/api/cart/clear-and-switch?branchId=' + pendingId, {
+                            method: 'GET',
+                            headers: {
+                                [csrfHeader]: csrfToken
+                            }
+                        }).then(response => {
+                            if (response.ok) {
+                                window.location.href = targetUrl;
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 </header>

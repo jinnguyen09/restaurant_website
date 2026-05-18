@@ -17,6 +17,16 @@ CREATE TABLE restaurants (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Giả sử chi nhánh 1 ở trung tâm (Thuế 10%, phí ship cao, 1000đ/điểm)
+UPDATE restaurants 
+SET tax_rate = 0.10, default_shipping_fee = 20000, point_exchange_rate = 1000, point_redemption_rate = 500
+WHERE restaurant_id = 1;
+
+-- Giả sử chi nhánh 2 ở ngoại ô (Thuế 8%, phí ship thấp hơn, 2000đ mới được 1 điểm)
+UPDATE restaurants 
+SET tax_rate = 0.08, default_shipping_fee = 12000, point_exchange_rate = 2000, point_redemption_rate = 400
+WHERE restaurant_id = 2;
+
 -- 2. Bảng ranked (Hạng thành viên)
 CREATE TABLE ranked (
     rank_id SMALLINT UNSIGNED PRIMARY KEY,
@@ -282,3 +292,139 @@ CREATE TABLE `tables` (
     CONSTRAINT `fk_tables_restaurant` FOREIGN KEY (`restaurant_id`) 
         REFERENCES `restaurants` (`restaurant_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 20. Tạo bảng orders (Thanh toán)
+CREATE TABLE orders (
+    order_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    voucher_id INT UNSIGNED DEFAULT NULL,
+    table_id INT UNSIGNED DEFAULT NULL,
+    restaurant_id SMALLINT UNSIGNED NOT NULL,
+    
+    -- Số tiền
+    total_price DECIMAL(19, 2) NOT NULL DEFAULT 0.00,
+    shipping_fee DECIMAL(19, 2) DEFAULT 0.00,
+    amount_discounted DECIMAL(19, 2) DEFAULT 0.00,
+    tax_amount DECIMAL(19, 2) DEFAULT 0.00,
+    
+    -- Thông tin vận chuyển & Trạng thái
+    delivery_address TEXT DEFAULT NULL,
+    status VARCHAR(50) NOT NULL COMMENT 'Pending, Confirmed, Shipping, Completed, Cancelled',
+    order_type VARCHAR(50) NOT NULL COMMENT 'Eat-in, Take-away, Delivery',
+    
+    -- Hệ thống điểm thưởng
+    points_redeemed INT DEFAULT 0,
+    point_earned INT DEFAULT 0,
+    
+    -- Thời gian
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Khóa ngoại (Giả định các bảng liên quan đã tồn tại)
+    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_orders_voucher FOREIGN KEY (voucher_id) REFERENCES vouchers(voucher_id),
+    CONSTRAINT fk_orders_table FOREIGN KEY (table_id) REFERENCES `tables`(table_id),
+    CONSTRAINT fk_orders_restaurant FOREIGN KEY (restaurant_id) REFERENCES restaurants(restaurant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 21. Bảng lưu lịch sử trạng thái đơn hàng
+CREATE TABLE order_status_history (
+    history_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_history_orders FOREIGN KEY (order_id) 
+        REFERENCES orders(order_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 22. Bảng thanh toán (Đã tối ưu thêm restaurant_id để báo cáo doanh thu chi nhánh)
+CREATE TABLE payment (
+    payment_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    restaurant_id SMALLINT UNSIGNED NOT NULL, 
+    payment_method VARCHAR(50) NOT NULL,
+    payment_status VARCHAR(50) NOT NULL,
+    paid_at DATETIME DEFAULT NULL,
+    CONSTRAINT fk_payment_orders FOREIGN KEY (order_id) 
+        REFERENCES orders(order_id) ON DELETE CASCADE,
+    CONSTRAINT fk_payment_restaurant FOREIGN KEY (restaurant_id) 
+        REFERENCES restaurants(restaurant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 23. Bảng cart_items
+CREATE TABLE cart_items (
+    cart_item_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    restaurant_product_id INT UNSIGNED NOT NULL,
+    quantity SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- 24. Bảng order_items
+CREATE TABLE order_items (
+    order_item_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    restaurant_product_id INT UNSIGNED NOT NULL,
+    quantity SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+    item_name VARCHAR(255) NOT NULL,
+    price_at_purchase DECIMAL(19, 2) NOT NULL,
+    CONSTRAINT fk_items_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- 25. Bảng Review
+CREATE TABLE IF NOT EXISTS reviews (
+    review_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_item_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    comment TEXT,
+    rating TINYINT UNSIGNED NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Đảm bảo mỗi món trong đơn hàng chỉ được review 1 lần
+    UNIQUE KEY unique_order_item_review (order_item_id),
+    -- Khóa ngoại liên kết tới bảng order_items (từ ảnh image_e3e7a2.png)
+    CONSTRAINT fk_review_order_item FOREIGN KEY (order_item_id) 
+        REFERENCES order_items(order_item_id) ON DELETE CASCADE,
+    -- Khóa ngoại liên kết tới bảng users
+    CONSTRAINT fk_review_user FOREIGN KEY (user_id) 
+        REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE reviews 
+ADD COLUMN status ENUM('PENDING', 'PUBLISHED', 'HIDDEN') DEFAULT 'PUBLISHED';
+
+ALTER TABLE reviews 
+ADD COLUMN parent_id INT UNSIGNED DEFAULT NULL;
+
+ALTER TABLE reviews 
+ADD CONSTRAINT fk_review_parent 
+FOREIGN KEY (parent_id) REFERENCES reviews(review_id) ON DELETE CASCADE;
+
+CREATE TABLE review_likes (
+    like_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    review_id INT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Đảm bảo mỗi người dùng chỉ có thể Like một bình luận duy nhất một lần
+    UNIQUE KEY unique_user_review (user_id, review_id),
+    
+    -- Ràng buộc khóa ngoại
+    CONSTRAINT fk_like_review FOREIGN KEY (review_id) REFERENCES reviews(review_id) ON DELETE CASCADE,
+    CONSTRAINT fk_like_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE reviews MODIFY order_item_id BIGINT UNSIGNED NULL;
+
+ALTER TABLE reviews DROP FOREIGN KEY fk_review_order_item;
+
+ALTER TABLE reviews DROP INDEX unique_order_item_review;
+
+ALTER TABLE reviews 
+ADD CONSTRAINT fk_review_order_item 
+FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id) ON DELETE CASCADE;
+
+-- Chạy lệnh tạo Index tối ưu hóa tốc độ truy vấn
+CREATE INDEX idx_reviews_perf ON reviews(status, parent_id, created_at DESC);
+

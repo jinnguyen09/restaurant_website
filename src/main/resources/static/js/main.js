@@ -43,24 +43,15 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// Logic xử lý Active cho Mobile Menu
 const mobileLinks = document.querySelectorAll('.mobile-nav-link');
 
 mobileLinks.forEach(link => {
     link.addEventListener('click', function() {
-        // Xóa class active ở tất cả các mục khác
         mobileLinks.forEach(l => l.classList.remove('active'));
-        // Thêm class active vào mục vừa click
         this.classList.add('active');
-        
-        // Tùy chọn: Đóng menu sau khi chọn (nếu là link nội bộ #)
-        // if(this.getAttribute('href').startsWith('#')) {
-        //    toggleMenu(false); 
-        // }
     });
 });
 
-// Tự động active dựa trên URL hiện tại (Nếu bạn dùng nhiều file .html)
 window.addEventListener('load', () => {
     const currentPath = window.location.pathname;
     mobileLinks.forEach(link => {
@@ -70,7 +61,6 @@ window.addEventListener('load', () => {
     });
 });
 
-// Tự động cập nhật gạch chân đỏ khi click vào các mục trên mobile
 const mLinks = document.querySelectorAll('.mobile-nav-link');
 mLinks.forEach(link => {
     link.addEventListener('click', function() {
@@ -79,25 +69,23 @@ mLinks.forEach(link => {
     });
 });
 
-// Lấy các phần tử
-const cartBtn = document.querySelector('.fa-cart-shopping').parentElement; // Nút giỏ hàng trên nav
+const cartBtn = document.querySelector('.fa-cart-shopping').parentElement;
 const sideCart = document.getElementById('side-cart');
 const cartContent = document.getElementById('cart-content');
 const closeCartBtn = document.getElementById('close-cart-btn');
 const cartOverlay = document.getElementById('cart-overlay');
 const bodyElement = document.body;
 
-// Hàm đóng/mở giỏ hàng
 function toggleCart(isOpen) {
     if (isOpen) {
         sideCart.classList.remove('hidden');
-        bodyElement.style.overflow = 'hidden'; // Khóa cuộn trang
+        bodyElement.style.overflow = 'hidden';
         setTimeout(() => {
             cartContent.classList.remove('translate-x-full');
         }, 10);
     } else {
         cartContent.classList.add('translate-x-full');
-        bodyElement.style.overflow = 'auto'; // Mở lại cuộn trang
+        bodyElement.style.overflow = 'auto';
         setTimeout(() => {
             sideCart.classList.add('hidden');
         }, 300);

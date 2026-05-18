@@ -2,10 +2,9 @@
 body { font-family: 'Saira', sans-serif; }
 h1, h2, h3, .font-title { font-family: 'Montserrat', sans-serif; }
 .hero-bg {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
-                        url('https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover; background-position: center;
-        }
+    background-size: cover;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)) center;
+}
 .transition-soft { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
 .nav-link.active {
@@ -142,14 +141,11 @@ h1, h2, h3, .font-title { font-family: 'Montserrat', sans-serif; }
     .delay-500 { animation-delay: 0.5s; }
     .delay-700 { animation-delay: 0.7s; }
 
-    /* Hiệu ứng nền hero nếu bạn muốn mượt hơn */
     .hero-bg {
-        background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('/img/anh-pho.jpg');
         background-size: cover;
-        background-position: center;
         transition: background-scale 10s ease-in-out;
         /* Căn chỉnh ảnh nền lên cao và thấp */
-        background-position: center 40%;
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)) center 40%;
     }
     .hero-bg:hover {
         background-size: 105%; /* Hiệu ứng zoom nền nhẹ khi hover toàn vùng */

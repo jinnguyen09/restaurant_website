@@ -19,9 +19,9 @@ public class AreaService {
     }
 
     @Transactional
-    public Area saveArea(Area area, Integer restaurantId) {
+    public void saveArea(Area area, Integer restaurantId) {
         area.setRestaurantId(restaurantId);
-        return areaRepository.save(area);
+        areaRepository.save(area);
     }
 
     @Transactional

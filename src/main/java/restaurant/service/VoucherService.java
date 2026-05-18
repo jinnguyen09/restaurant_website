@@ -13,6 +13,7 @@ import restaurant.repository.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -169,16 +170,24 @@ public class VoucherService {
 
     public List<UserVoucher> getAvailableVouchersForUser(User user, Integer restaurantId) {
         List<UserVoucher> allMyVouchers = userVoucherRepository.findByUserAndUsedAtIsNull(user);
+        LocalDateTime now = LocalDateTime.now();
 
         return allMyVouchers.stream()
                 .filter(uv -> {
                     Voucher v = uv.getVoucher();
+
+                    boolean isExpired = v.getExpiryDate() != null && now.isAfter(v.getExpiryDate());
+                    if (isExpired) return false;
+
+                    boolean hasUsageLeft = v.getUsageLimit() == null || v.getUsageLimit() > 0;
+                    if (!hasUsageLeft) return false;
+
                     if (v.getApplyType() == Voucher.ApplyType.ALL) return true;
 
                     return voucherRestaurantRepository.existsByVoucherVoucherIdAndRestaurantRestaurantId(
                             v.getVoucherId(), restaurantId);
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Transactional

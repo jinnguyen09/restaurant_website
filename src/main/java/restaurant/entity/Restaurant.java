@@ -59,4 +59,16 @@ public class Restaurant {
             this.status = 1;
         }
     }
+
+    @Column(name = "tax_rate", precision = 5, scale = 2)
+    private java.math.BigDecimal taxRate;
+
+    @Column(name = "default_shipping_fee", precision = 19, scale = 2)
+    private java.math.BigDecimal defaultShippingFee;
+
+    @Column(name = "point_exchange_rate")
+    private Integer pointExchangeRate;
+
+    @Column(name = "point_redemption_rate")
+    private java.math.BigDecimal pointRedemptionRate;
 }

@@ -87,30 +87,37 @@ public class AdminMenuController {
     public String saveProduct(@ModelAttribute("productDto") ProductBranchDTO productDto,
                               @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                               HttpSession session,
-                              RedirectAttributes redirectAttributes) throws IOException {
+                              RedirectAttributes redirectAttributes,
+                              Model model) throws IOException {
 
         Integer branchId = (Integer) session.getAttribute("currentBranchId");
         if (branchId == null) return "redirect:/admin/menu";
 
-        if (imageFile != null && !imageFile.isEmpty()) {
-            if (productDto.getProductId() != null) {
-                Product oldProduct = productService.getProductById(productDto.getProductId());
-                if (oldProduct.getImageUrl() != null) {
-                    fileService.deleteOldFile(oldProduct.getImageUrl());
-                }
-            }
-            productDto.setImageUrl(fileService.saveAvatar(imageFile));
-        } else if (productDto.getProductId() != null) {
-            productDto.setImageUrl(productService.getProductById(productDto.getProductId()).getImageUrl());
-        }
-
         try {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                if (productDto.getProductId() != null) {
+                    Product oldProduct = productService.getProductById(productDto.getProductId());
+                    if (oldProduct.getImageUrl() != null) {
+                        fileService.deleteOldFile(oldProduct.getImageUrl());
+                    }
+                }
+
+                productDto.setImageUrl(fileService.saveImage(imageFile));
+            } else if (productDto.getProductId() != null) {
+                productDto.setImageUrl(
+                        productService.getProductById(productDto.getProductId()).getImageUrl()
+                );
+            }
+
             productService.saveProductFromDto(productDto, branchId);
             redirectAttributes.addFlashAttribute("success", "Cập nhật thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Lỗi: " + e.getMessage());
+            return "redirect:/admin/menu";
+
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("categories", categoryService.getSubCategoriesByParentId(1));
+            return "/admin/menu-form";
         }
-        return "redirect:/admin/menu";
     }
 
     @GetMapping("/delete/{id}")

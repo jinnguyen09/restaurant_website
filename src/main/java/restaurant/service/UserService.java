@@ -15,17 +15,13 @@ import restaurant.entity.*;
 import restaurant.repository.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
     @Autowired private RankRepository rankRepository;
     @Autowired private PointRepository pointRepository;
     @Autowired private NotificationRepository notificationRepository;
@@ -34,6 +30,8 @@ public class UserService {
     @Autowired private FileService fileService;
     @Autowired private RoleRepository roleRepository;
     @Autowired private UserRoleRepository userRoleRepository;
+    @Autowired private RestaurantRepository restaurantRepository;
+
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -134,7 +132,7 @@ public class UserService {
     }
 
     @Transactional
-    public boolean addPoints(Long userId, int pointsToAdd) {
+    public void addPoints(Long userId, int pointsToAdd) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
@@ -161,7 +159,6 @@ public class UserService {
         }
 
         userRepository.save(user);
-        return isRankUp;
     }
 
     public List<CustomerDTO> getCustomerStats(String keyword) {
@@ -293,5 +290,10 @@ public class UserService {
 
     public User getByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public Restaurant getRestaurantById(Integer id) {
+        return restaurantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy chi nhánh với ID: " + id));
     }
 }

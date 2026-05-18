@@ -45,4 +45,10 @@ public class RestaurantProduct {
 
     @Transient
     private BigDecimal discountPrice;
+
+    @Transient
+    private Double averageRating;
+
+    @Transient
+    private Long reviewCount;
 }

@@ -23,6 +23,9 @@ public class SecurityConfig {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private restaurant.service.CartService cartService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -33,12 +36,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-
-                        .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**").permitAll()
-                                .requestMatchers("/uploads/**").permitAll()
-                                .requestMatchers("/select-branch/**").permitAll()
-                                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER", "STAFF")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**", "/js/**", "/img/**", "/vendor/**", "/uploads/**").permitAll()
+                        .requestMatchers("/select-branch/**").permitAll()
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER", "STAFF")
                         .requestMatchers("/", "/home","/menu", "/food-detail" ,"/reservation","/market","/blog","/contact","/sign-in","/sign-up").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -49,7 +50,13 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             String email = authentication.getName();
                             User user = userRepository.findByEmail(email).orElse(null);
-                            request.getSession().setAttribute("loggedInUser", user);
+
+                            if (user != null) {
+                                cartService.clearCart(user.getUserId());
+
+                                request.getSession().setAttribute("currentBranchId", 1);
+                                request.getSession().setAttribute("loggedInUser", user);
+                            }
 
                             response.sendRedirect("/home");
                         })
@@ -57,6 +64,14 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
+                        .addLogoutHandler((request, response, authentication) -> {
+                            if (authentication != null) {
+                                String email = authentication.getName();
+                                userRepository.findByEmail(email).ifPresent(user -> {
+                                    cartService.clearCart(user.getUserId());
+                                });
+                            }
+                        })
                         .logoutSuccessUrl("/home")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")

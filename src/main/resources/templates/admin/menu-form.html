@@ -26,6 +26,11 @@
 
 <div class="container py-4">
   <div class="form-container">
+
+    <div th:if="${error}" class="bg-red-100 text-red-700 p-3 rounded mb-4">
+      <span th:text="${error}"></span>
+    </div>
+
     <div class="header-title mb-4">
       <h3 class="fw-bold text-dark mb-0" th:text="${productDto.productId == null ? 'Thêm món ăn mới' : 'Cập nhật món ăn'}"></h3>
       <p class="text-muted small mt-1">Hệ thống quản lý thực đơn chi nhánh: <span class="text-danger fw-bold" th:text="${session.currentBranchName}"></span></p>
@@ -108,7 +113,7 @@
           <div class="text-center p-3 border rounded-4 bg-light">
             <img id="preview" th:src="${productDto.imageUrl != null ? productDto.imageUrl : 'https://via.placeholder.com/200'}" class="preview-img mb-3 shadow-sm">
             <input type="file" name="imageFile" id="imageInput" class="form-control form-control-sm" accept="image/*">
-            <small class="text-muted mt-2 d-block">Khuyên dùng ảnh tỉ lệ 1:1</small>
+            <small class="text-muted mt-2 d-block">Ảnh kích thước dưới 5 MB (JPG, PNG)</small>
           </div>
         </div>
 

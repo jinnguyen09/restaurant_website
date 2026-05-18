@@ -47,11 +47,4 @@ public class RestaurantService {
 
         repo.save(restaurant);
     }
-
-    @Transactional
-    public void toggleStatus(Integer id) {
-        Restaurant res = getRestaurantInfo(id);
-        res.setStatus(res.getStatus() == 1 ? 0 : 1);
-        repo.save(res);
-    }
 }

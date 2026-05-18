@@ -50,14 +50,37 @@ public class FileService {
     public String saveImage(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) return null;
 
+        String contentType = file.getContentType();
+
+        if (contentType == null ||
+                !(contentType.equals("image/jpeg") ||
+                        contentType.equals("image/png") ||
+                        contentType.equals("image/webp"))) {
+            throw new RuntimeException("Chỉ hỗ trợ JPG, PNG.");
+        }
+
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new RuntimeException("Ảnh tối đa 5MB");
+        }
+
+        BufferedImage image = ImageIO.read(file.getInputStream());
+        if (image == null) {
+            throw new RuntimeException("File ảnh không hợp lệ. Vui lòng thử lại ảnh khác!");
+        }
+
         String fileName = createUploadDirectory();
         Path targetPath = Paths.get(uploadPath).resolve(fileName);
 
-        Thumbnails.of(file.getInputStream())
-                .scale(1.0)
-                .outputFormat("jpg")
-                .outputQuality(0.8)
-                .toFile(targetPath.toFile());
+        try {
+            Thumbnails.of(image)
+                    .size(1200, 1200)
+                    .keepAspectRatio(true)
+                    .outputFormat("jpg")
+                    .outputQuality(0.95)
+                    .toFile(targetPath.toFile());
+        } catch (Exception e) {
+            throw new RuntimeException("Không thể xử lý ảnh!");
+        }
 
         return "/" + uploadPath + "/" + fileName;
     }

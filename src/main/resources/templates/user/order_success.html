@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh toán thành công - Phở Hầm</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-10 text-center border border-gray-100">
+  <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+    <i class="fa-solid fa-check text-4xl"></i>
+  </div>
+
+  <h1 class="text-3xl font-black text-gray-800 mb-2 uppercase italic">Tuyệt vời!</h1>
+  <p class="text-gray-500 mb-8">Giao dịch của bạn đã hoàn tất. Nhà hàng đang bắt đầu chuẩn bị món ăn ngay bây giờ.</p>
+
+  <div class="bg-gray-50 rounded-2xl p-5 mb-8 border border-gray-100">
+    <div class="flex justify-between mb-2 text-sm">
+      <span class="text-gray-400">Mã đơn hàng:</span>
+      <span class="font-bold text-gray-700" th:text="'#' + ${orderId}"></span>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="text-gray-400">Trạng thái:</span>
+      <span class="font-bold text-green-600">Đã thanh toán</span>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    <a th:href="@{'/order/detail/' + ${orderId}}"
+       class="block w-full py-4 bg-red-600 text-white rounded-2xl font-black shadow-lg hover:bg-red-700 transition-all uppercase tracking-widest text-sm">
+      <i class="fa-solid fa-file-invoice-dollar mr-2"></i> Xem hóa đơn chi tiết
+    </a>
+
+    <a th:href="@{/menu}"
+       class="block w-full py-4 bg-gray-100 text-gray-600 rounded-2xl font-bold hover:bg-gray-200 transition-all text-sm">
+      Quay lại thực đơn
+    </a>
+  </div>
+
+  <p class="text-gray-500 mb-8" th:text="${orderStatus == 'PAID' ? 'Cảm ơn bạn đã thanh toán! Đơn hàng đang được chuẩn bị.' : 'Đơn hàng đã được ghi nhận. Vui lòng chuẩn bị tiền mặt khi nhận hàng.'}"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+  window.onload = function() {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ef4444', '#10b981', '#f59e0b']
+    });
+  };
+</script>
+
+</body>
+</html>

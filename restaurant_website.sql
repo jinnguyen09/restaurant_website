@@ -428,3 +428,72 @@ FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id) ON DELETE CASC
 -- Chạy lệnh tạo Index tối ưu hóa tốc độ truy vấn
 CREATE INDEX idx_reviews_perf ON reviews(status, parent_id, created_at DESC);
 
+-- ==========================
+-- Bảng blogs
+-- ==========================
+CREATE TABLE blogs (
+    blog_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status TINYINT DEFAULT 1,
+
+    CONSTRAINT fk_blog_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ==========================
+-- Bảng comments
+-- ==========================
+CREATE TABLE comments (
+    comment_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    blog_id INT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    content TEXT NOT NULL,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    parent_comment_id INT UNSIGNED NULL,
+
+    CONSTRAINT fk_comment_blog
+        FOREIGN KEY (blog_id)
+        REFERENCES blogs(blog_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_comment_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_parent_comment
+        FOREIGN KEY (parent_comment_id)
+        REFERENCES comments(comment_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ==========================
+-- Bảng favourites
+-- ==========================
+CREATE TABLE favourites (
+    favourite_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    restaurant_product_id INT UNSIGNED NOT NULL,
+
+    CONSTRAINT fk_favourite_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_favourite_product
+        FOREIGN KEY (restaurant_product_id)
+        REFERENCES restaurant_products(restaurant_product_id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY unique_user_product (
+        user_id,
+        restaurant_product_id
+    )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
